@@ -8,7 +8,6 @@ interface ApprovalEvent {
   spender: string;
   amount: string;
   timestamp: number;
-  transactionHash: string;
   blockNumber: number;
 }
 

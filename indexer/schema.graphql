@@ -1,0 +1,30 @@
+# RegisteredUser - tracks users who registered in UserRegistry
+type RegisteredUser {
+  id: ID! # User address (lowercase)
+  address: String! @index
+  registeredAt: BigInt!
+  isActive: Boolean! @index # false if user unregistered
+}
+
+# Approval - ALL ERC20 approval events (not just registered users)
+type Approval {
+  id: ID! # chainId_blockNumber_logIndex
+  owner: String! @index
+  spender: String! @index
+  tokenAddress: String! @index
+  amount: String!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+}
+
+# MonitoredApproval - Approvals from REGISTERED users only (sent to backend)
+type MonitoredApproval {
+  id: ID! # chainId_blockNumber_logIndex
+  userAddress: String! @index
+  tokenAddress: String! @index
+  spender: String! @index
+  amount: String!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  notifiedBackend: Boolean! # Did we successfully call the webhook?
+}

@@ -83,3 +83,14 @@ cast balance 0x4a39e9F9A20430a82480F538c14c55cf5e858659 --rpc-url https://testne
 ```bash
 cast send 0x2CC70f80098e20717D480270187DCb0c1Ccf826e "register()" --private-key $YOUR_PRIVATE_KEY --rpc-url https://testnet-rpc.monad.xyz
 ```
+## Backend Deployment
+
+**URL:** https://shieldai.up.railway.app
+**Status:** ✅ LIVE
+
+### Endpoints:
+- `GET /health` - Health check
+- `POST /api/webhook/approval` - Envio webhook
+- `POST /api/delegation/store` - Store user delegation
+- `GET /api/delegation/:address` - Get delegation
+- `GET /api/delegation/:address/exists` - Check if exists

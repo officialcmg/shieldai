@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=./node_modules/envio/evm.schema.json
+name: ShieldAI
+description: ShieldAI - AI-powered wallet guardian indexing registered users and ERC20 approvals
+networks:
+  - id: 41454 # Monad Testnet
+    start_block: 43620720 # UserRegistry deployment block
+    rpc_config:
+      url: https://testnet-rpc.monad.xyz
+    contracts:
+      # UserRegistry - track registered/unregistered users
+      - name: UserRegistry
+        address: "0x2CC70f80098e20717D480270187DCb0c1Ccf826e"
+        abi_file_path: ./abis/UserRegistry.json
+        handler: src/EventHandlers.ts
+        events:
+          - event: "UserRegistered(address indexed user, uint256 timestamp)"
+          - event: "UserUnregistered(address indexed user, uint256 timestamp)"
+      
+      # ERC20 - wildcard indexing for ALL ERC20 approvals
+      - name: ERC20
+        abi_file_path: ./abis/ERC20.json
+        handler: src/EventHandlers.ts
+        events:
+          - event: "Approval(address indexed owner, address indexed spender, uint256 value)"
+
+# Preload optimization makes indexer much faster
+# Handlers run twice - use Effect API for external calls!
+preload_handlers: true
+
+# Use lowercase addresses for better performance
+address_format: lowercase

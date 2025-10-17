@@ -12,7 +12,6 @@ const ApprovalWebhookSchema = z.object({
   spender: z.string(),
   amount: z.string(),
   timestamp: z.number(),
-  transactionHash: z.string(),
   blockNumber: z.number(),
 });
 

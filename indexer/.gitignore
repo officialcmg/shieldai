@@ -1,0 +1,74 @@
+# Compiled source
+*.exe
+*.obj
+*.out
+*.compile
+*.native
+*.byte
+*.cmo
+*.annot
+*.cmi
+*.cmx
+*.cmt
+*.cmti
+*.cma
+*.a
+*.cmxa
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Envio generated files
+.envio
+generated
+src/generated
+
+# Typescript generated code
+src/**/*.bs.js
+src/**/*.mjs
+src/**/*.gen.tsx
+
+# Build artifacts
+lib
+build
+
+# Dependency directories
+node_modules/
+/.pnp
+.pnp.js
+
+# Local
+test/coerce
+test/diff.txtenv
+*.res.js
+*.res.mjs
+benchmarks/
+artifacts
+cache
+.vscode
+.merlin
+.bsb.lock
+*~
+*.annot
+*.cmj
+*.bak
