@@ -6,8 +6,6 @@ networks:
     start_block: 43620720 # UserRegistry deployment block
     hypersync_config:
       url: https://monad-testnet.hypersync.xyz
-    rpc_config:
-      url: https://testnet-rpc.monad.xyz # Fallback only
     contracts:
       # UserRegistry - track registered/unregistered users
       - name: UserRegistry
