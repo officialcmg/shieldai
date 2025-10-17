@@ -3,9 +3,11 @@ name: ShieldAI
 description: ShieldAI - AI-powered wallet guardian indexing registered users and ERC20 approvals
 networks:
   - id: 41454 # Monad Testnet
-    start_block: 43804211 # Current block - real-time indexing from now
+    start_block: 43620720 # UserRegistry deployment block
+    hypersync_config:
+      url: https://monad-testnet.hypersync.xyz
     rpc_config:
-      url: https://testnet-rpc.monad.xyz
+      url: https://testnet-rpc.monad.xyz # Fallback only
     contracts:
       # UserRegistry - track registered/unregistered users
       - name: UserRegistry
