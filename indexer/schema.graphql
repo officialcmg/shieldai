@@ -13,6 +13,7 @@ type Approval {
   spender: String! @index
   tokenAddress: String! @index
   amount: String!
+  isRevocation: Boolean! @index # true if amount is 0 (revoked approval)
   timestamp: BigInt!
   blockNumber: BigInt!
 }
@@ -24,6 +25,7 @@ type MonitoredApproval {
   tokenAddress: String! @index
   spender: String! @index
   amount: String!
+  isRevocation: Boolean! @index # true if amount is 0 (revoked approval)
   timestamp: BigInt!
   blockNumber: BigInt!
   notifiedBackend: Boolean! # Did we successfully call the webhook?

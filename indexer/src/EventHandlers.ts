@@ -10,6 +10,7 @@ const notifyBackend = experimental_createEffect({
     tokenAddress: S.string,
     spender: S.string,
     amount: S.string,
+    isRevocation: S.boolean,
     timestamp: S.number,
     blockNumber: S.number,
   },
@@ -73,6 +74,8 @@ ERC20.Approval.handler(
     const owner = event.params.owner.toLowerCase();
     const spender = event.params.spender.toLowerCase();
     const approvalId = `${event.chainId}_${event.block.number}_${event.logIndex}`;
+    const amount = event.params.value.toString();
+    const isRevocation = amount === "0";
     
     // Store ALL approvals (not just registered users)
     context.Approval.set({
@@ -80,7 +83,8 @@ ERC20.Approval.handler(
       owner: owner,
       spender: spender,
       tokenAddress: event.srcAddress,
-      amount: event.params.value.toString(),
+      amount: amount,
+      isRevocation: isRevocation,
       timestamp: BigInt(event.block.timestamp),
       blockNumber: BigInt(event.block.number),
     });
@@ -97,7 +101,8 @@ ERC20.Approval.handler(
         userAddress: owner,
         tokenAddress: event.srcAddress,
         spender: spender,
-        amount: event.params.value.toString(),
+        amount: amount,
+        isRevocation: isRevocation,
         timestamp: BigInt(event.block.timestamp),
         blockNumber: BigInt(event.block.number),
         notifiedBackend: false,
@@ -110,7 +115,8 @@ ERC20.Approval.handler(
           userAddress: owner,
           tokenAddress: event.srcAddress,
           spender: spender,
-          amount: event.params.value.toString(),
+          amount: amount,
+          isRevocation: isRevocation,
           timestamp: event.block.timestamp,
           blockNumber: event.block.number,
         });
@@ -121,7 +127,8 @@ ERC20.Approval.handler(
           userAddress: owner,
           tokenAddress: event.srcAddress,
           spender: spender,
-          amount: event.params.value.toString(),
+          amount: amount,
+          isRevocation: isRevocation,
           timestamp: BigInt(event.block.timestamp),
           blockNumber: BigInt(event.block.number),
           notifiedBackend: result.success,

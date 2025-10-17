@@ -11,6 +11,7 @@ const ApprovalWebhookSchema = z.object({
   tokenAddress: z.string(),
   spender: z.string(),
   amount: z.string(),
+  isRevocation: z.boolean(),
   timestamp: z.number(),
   blockNumber: z.number(),
 });

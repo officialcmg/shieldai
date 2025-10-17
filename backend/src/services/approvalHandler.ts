@@ -7,6 +7,7 @@ interface ApprovalEvent {
   tokenAddress: string;
   spender: string;
   amount: string;
+  isRevocation: boolean;
   timestamp: number;
   blockNumber: number;
 }
@@ -21,8 +22,15 @@ export async function handleNewApproval(approval: ApprovalEvent): Promise<void> 
   console.log(`   Token: ${approval.tokenAddress}`);
   console.log(`   Spender: ${approval.spender}`);
   console.log(`   Amount: ${approval.amount}`);
+  console.log(`   Is Revocation: ${approval.isRevocation ? '✅ YES' : '❌ NO'}`);
 
   try {
+    // Skip threat detection if this is already a revocation
+    if (approval.isRevocation) {
+      console.log(`✅ This is a revocation (amount = 0) - no threat detection needed`);
+      return;
+    }
+
     // Step 1: Run threat detection
     const threatResult = await detectThreat(approval);
 
