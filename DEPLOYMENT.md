@@ -1,5 +1,11 @@
 # ShieldAI Deployment Info
 
+## GitHub Repository
+
+**Repository:** https://github.com/officialcmg/shieldai
+
+---
+
 ## Deployed Contracts (Monad Testnet)
 
 ### UserRegistry

@@ -23,7 +23,7 @@
 
 1. Click **"New Project"**
 2. Select **"Deploy from GitHub repo"**
-3. Choose your repo: `metamask/shieldai`
+3. Choose your repo: `officialcmg/shieldai`
 4. **Set Root Directory:** `backend`
 
 ### 3️⃣ Add PostgreSQL
