@@ -1,0 +1,30 @@
+# Compiler files
+cache/
+out/
+broadcast/
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Dependencies
+lib/
+
+# Node (if using)
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Foundry
+*.log
+lcov.info
