@@ -25,6 +25,7 @@ networks:
 
 # Preload optimization makes indexer much faster
 # Handlers run twice - use Effect API for external calls!
+# Means that if our api fails first time the second call can come in clutch
 preload_handlers: true
 
 # Use lowercase addresses for better performance
