@@ -152,6 +152,50 @@ query {
 }
 ```
 
+### Get Current Approval State (Live State)
+```graphql
+query CurrentApprovals($userAddress: String!) {
+  CurrentApproval(
+    where: { 
+      owner: { _eq: $userAddress }
+      isRevocation: { _eq: false }
+    }
+  ) {
+    id
+    tokenAddress
+    spender
+    amount
+    timestamp
+  }
+}
+```
+
+## 🔴 Real-Time Subscriptions
+
+### Subscribe to User's Active Approvals
+```graphql
+subscription UserApprovals($userAddress: String!) {
+  CurrentApproval(
+    where: { 
+      owner: { _eq: $userAddress }
+      isRevocation: { _eq: false }
+    }
+  ) {
+    id
+    tokenAddress
+    spender
+    amount
+    timestamp
+  }
+}
+```
+
+**How it works:**
+- Approval event → Creates/Updates `CurrentApproval`
+- Revocation (amount=0) → Updates `isRevocation: true`
+- Your frontend auto-updates via WebSocket!
+- Approvals appear/disappear in real-time! ⚡
+
 ## 🌐 Deployed Contracts
 
 - **UserRegistry**: `0x2CC70f80098e20717D480270187DCb0c1Ccf826e`

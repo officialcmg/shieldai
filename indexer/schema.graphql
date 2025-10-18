@@ -10,8 +10,8 @@ type RegisteredUser {
 type Approval {
   id: ID! # chainId_blockNumber_logIndex
   owner: String! @index
-  spender: String! @index
   tokenAddress: String! @index
+  spender: String! @index
   amount: String!
   isRevocation: Boolean! @index # true if amount is 0 (revoked approval)
   timestamp: BigInt!
@@ -29,4 +29,18 @@ type MonitoredApproval {
   timestamp: BigInt!
   blockNumber: BigInt!
   notifiedBackend: Boolean! # Did we successfully call the webhook?
+}
+
+# CurrentApproval - Latest approval state per (owner, tokenAddress, spender)
+# This is the "current state" of approvals - gets UPDATED on each new approval event
+type CurrentApproval {
+  id: ID! # owner_tokenAddress_spender
+  owner: String! @index
+  tokenAddress: String! @index
+  spender: String! @index
+  amount: String! # Current approval amount
+  isRevocation: Boolean! @index # true if latest event was amount = 0
+  timestamp: BigInt! # When this state was last updated
+  blockNumber: BigInt! # Block number of last update
+  lastEventId: String! # Reference to the Approval event that caused this state
 }

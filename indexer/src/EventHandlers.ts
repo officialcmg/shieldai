@@ -89,6 +89,20 @@ ERC20.Approval.handler(
       blockNumber: BigInt(event.block.number),
     });
     
+    // Update current approval state (this will UPDATE if exists, CREATE if new)
+    const currentApprovalId = `${owner}_${event.srcAddress}_${spender}`;
+    context.CurrentApproval.set({
+      id: currentApprovalId,
+      owner: owner,
+      tokenAddress: event.srcAddress,
+      spender: spender,
+      amount: amount,
+      isRevocation: isRevocation,
+      timestamp: BigInt(event.block.timestamp),
+      blockNumber: BigInt(event.block.number),
+      lastEventId: approvalId,
+    });
+    
     // Check if this is a REGISTERED and ACTIVE user
     const registeredUser = await context.RegisteredUser.get(owner);
     
