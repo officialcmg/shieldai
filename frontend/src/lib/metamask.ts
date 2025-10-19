@@ -357,6 +357,86 @@ export async function makeUnlimitedApproval(
   return receipt.receipt.transactionHash
 }
 
+export async function makeLimitedApproval(
+  smartAccount: any,
+  tokenAddress: string,
+  spenderAddress: string,
+  amount: bigint
+) {
+  console.log('🎭 Making LIMITED approval from smart account...')
+  console.log('   Smart Account:', smartAccount.address)
+  console.log('   Token:', tokenAddress)
+  console.log('   Spender:', spenderAddress)
+  console.log('   Amount:', amount.toString(), '(limited)')
+
+  // 1. Create bundler client
+  const bundlerClient = createBundlerClient({
+    client: publicClient,
+    transport: http(PIMLICO_BUNDLER_URL),
+  })
+
+  // 2. Create paymaster client
+  const paymasterClient = createPaymasterClient({
+    transport: http(PIMLICO_BUNDLER_URL),
+  })
+
+  console.log('   📦 Bundler + Paymaster clients created')
+
+  // 3. Encode approve(spender, amount)
+  const approveCalldata = encodeFunctionData({
+    abi: [
+      {
+        name: 'approve',
+        type: 'function',
+        stateMutability: 'nonpayable',
+        inputs: [
+          { name: 'spender', type: 'address' },
+          { name: 'amount', type: 'uint256' },
+        ],
+        outputs: [{ type: 'bool' }],
+      },
+    ],
+    functionName: 'approve',
+    args: [
+      spenderAddress as Address,
+      amount, // LIMITED amount - triggers AI analysis!
+    ],
+  })
+
+  console.log('   📝 Encoded approve(spender, LIMITED_AMOUNT) calldata')
+
+  // 4. Send user operation with paymaster
+  console.log('   🚀 Sending approval user operation...')
+  
+  const userOpHash = await bundlerClient.sendUserOperation({
+    account: smartAccount,
+    calls: [
+      {
+        to: tokenAddress as Address,
+        data: approveCalldata,
+        value: BigInt(0),
+      },
+    ],
+    paymaster: paymasterClient,
+  })
+
+  console.log('   ⏳ User operation sent! Hash:', userOpHash)
+  console.log('   ⏳ Waiting for bundler to include in block...')
+
+  // 5. Wait for confirmation
+  const receipt = await bundlerClient.waitForUserOperationReceipt({
+    hash: userOpHash,
+  })
+
+  console.log('✅ Approval user operation confirmed!')
+  console.log('   TX Hash:', receipt.receipt.transactionHash)
+  console.log('   Status:', receipt.success ? 'success' : 'failed')
+  console.log('')
+  console.log('🤖 ShieldAI AI will now analyze the spender contract bytecode!')
+  
+  return receipt.receipt.transactionHash
+}
+
 /**
  * Store delegation in backend
  */

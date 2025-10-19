@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Zap, Loader2 } from 'lucide-react'
 import { createWalletClient, custom, createPublicClient, http } from 'viem'
 import { Implementation, toMetaMaskSmartAccount } from '@metamask/delegation-toolkit'
-import { makeUnlimitedApproval } from '@/lib/metamask'
+import { makeUnlimitedApproval, makeLimitedApproval } from '@/lib/metamask'
 import { monadTestnet } from '@/lib/constants'
 
 interface DemoSectionProps {
@@ -12,24 +12,29 @@ interface DemoSectionProps {
 }
 
 // Mock ERC20 token for demo
-// Using USDC- address 
-const DEMO_TOKEN_ADDRESS = '0x62534e4bbd6d9ebac0ac99aeaa0aa48e56372df0' // Placeholder - deploy test token!
+// Using USDC address 
+const DEMO_TOKEN_ADDRESS = '0x62534e4bbd6d9ebac0ac99aeaa0aa48e56372df0'
 const SUSPICIOUS_SPENDER = '0x1234567890123456789012345678901234567890' // Random address
+const MALICIOUS_CONTRACT = '0x2c641138a924cfbE42e0E6b4eb4E142D3c84ab1A' // Deployed malicious contract
 
 export function DemoSection({ userAddress }: DemoSectionProps) {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
+  const [loading1, setLoading1] = useState(false)
+  const [error1, setError1] = useState('')
+  const [success1, setSuccess1] = useState(false)
+  
+  const [loading2, setLoading2] = useState(false)
+  const [error2, setError2] = useState('')
+  const [success2, setSuccess2] = useState(false)
 
   const createMockApproval = async () => {
     if (!window.ethereum) {
-      setError('MetaMask not found')
+      setError1('MetaMask not found')
       return
     }
 
-    setLoading(true)
-    setError('')
-    setSuccess(false)
+    setLoading1(true)
+    setError1('')
+    setSuccess1(false)
 
     try {
       console.log('🎭 Creating unlimited approval from SMART ACCOUNT...')
@@ -74,7 +79,7 @@ export function DemoSection({ userAddress }: DemoSectionProps) {
 
       console.log('✅ Unlimited approval created!')
       console.log('   TX Hash:', txHash)
-      setSuccess(true)
+      setSuccess1(true)
 
       // The approval will be:
       // 1. Caught by Envio indexer (monitors smart account address)
@@ -85,60 +90,195 @@ export function DemoSection({ userAddress }: DemoSectionProps) {
       // 6. UI shows it turn red via GraphQL subscription! 🛡️
     } catch (err: any) {
       console.error('❌ Demo approval failed:', err)
-      setError(err.message || 'Failed to create approval')
+      setError1(err.message || 'Failed to create approval')
     } finally {
-      setLoading(false)
+      setLoading1(false)
+    }
+  }
+
+  const createMaliciousApproval = async () => {
+    if (!window.ethereum) {
+      setError2('MetaMask not found')
+      return
+    }
+
+    setLoading2(true)
+    setError2('')
+    setSuccess2(false)
+
+    try {
+      console.log('🎭 Creating unlimited approval to MALICIOUS CONTRACT...')
+      console.log('   Smart Account Address:', userAddress)
+
+      // 1. Get EOA address from MetaMask
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' }) as string[]
+      const eoaAddress = accounts[0]
+      
+      console.log('   EOA Owner:', eoaAddress)
+
+      // 2. Create wallet client with EOA account
+      const walletClient = createWalletClient({
+        account: eoaAddress as `0x${string}`,
+        chain: monadTestnet,
+        transport: custom(window.ethereum),
+      })
+
+      // 3. Create public client
+      const publicClient = createPublicClient({
+        chain: monadTestnet,
+        transport: http(),
+      })
+
+      // 4. Recreate smart account instance
+      console.log('   Recreating smart account instance...')
+      const smartAccount = await toMetaMaskSmartAccount({
+        client: publicClient,
+        implementation: Implementation.Hybrid,
+        address: userAddress as `0x${string}`,
+        signer: { walletClient },
+      })
+
+      console.log('   ✅ Smart account ready!')
+
+      // 5. Approve LIMITED amount (69420 USDC) to MALICIOUS CONTRACT
+      // This triggers AI bytecode analysis!
+      const approvalAmount = BigInt(69420) * BigInt(10 ** 6) // 69,420 USDC (6 decimals)
+      
+      const txHash = await makeLimitedApproval(
+        smartAccount,
+        DEMO_TOKEN_ADDRESS,
+        MALICIOUS_CONTRACT, // AI will analyze this contract's bytecode!
+        approvalAmount
+      )
+
+      console.log('✅ Limited approval (69,420 USDC) to malicious contract created!')
+      console.log('   TX Hash:', txHash)
+      setSuccess2(true)
+
+      // AI will analyze bytecode and detect:
+      // - Unrestricted transferFrom calls
+      // - Owner-only drain functions
+      // - Hidden backdoors
+      // - Risk Score: 95/100 → AUTO-REVOKE! 🔥
+    } catch (err: any) {
+      console.error('❌ Malicious approval failed:', err)
+      setError2(err.message || 'Failed to create approval')
+    } finally {
+      setLoading2(false)
     }
   }
 
   return (
-    <div className="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-300 rounded-xl p-8">
-      <div className="flex items-start gap-4 mb-6">
-        <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-          <Zap className="w-6 h-6 text-white" />
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900">🎬 Demo Mode</h2>
+      
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Demo Card 1: Random Suspicious Address */}
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-300 rounded-xl p-6">
+          <div className="flex items-start gap-3 mb-4">
+            <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 mb-1">Test #1: Random Address</h3>
+              <p className="text-sm text-gray-700">
+                Approve to suspicious EOA
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg p-3 mb-4">
+            <h4 className="font-semibold mb-2 text-xs text-gray-900">What happens:</h4>
+            <ol className="text-xs text-gray-700 space-y-1 list-decimal list-inside">
+              <li>Unlimited approval to random address</li>
+              <li>AI detects: EOA (not a contract)</li>
+              <li>Auto-revoked immediately</li>
+              <li>Watch it turn red! 🔥</li>
+            </ol>
+          </div>
+
+          {error1 && (
+            <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs">
+              {error1}
+            </div>
+          )}
+
+          {success1 && (
+            <div className="mb-3 p-2 bg-green-50 border border-green-200 rounded-lg text-green-600 text-xs">
+              ✅ Created! Watch ShieldAI revoke it...
+            </div>
+          )}
+
+          <button
+            onClick={createMockApproval}
+            disabled={loading1 || !userAddress}
+            className="w-full px-4 py-2.5 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+          >
+            {loading1 && <Loader2 className="w-4 h-4 animate-spin" />}
+            {loading1 ? 'Creating...' : 'Approve UNLIMITED USDC'}
+          </button>
+
+          <p className="mt-2 text-xs text-gray-600 text-center">
+            Spender: {SUSPICIOUS_SPENDER.slice(0, 10)}...
+          </p>
         </div>
-        <div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">🎬 Demo Mode</h3>
-          <p className="text-gray-700">
-            Create a real unlimited token approval to see ShieldAI in action!
+
+        {/* Demo Card 2: Malicious Contract */}
+        <div className="bg-gradient-to-br from-red-50 to-orange-100 border-2 border-red-300 rounded-xl p-6">
+          <div className="flex items-start gap-3 mb-4">
+            <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 mb-1">Test #2: Malicious Contract</h3>
+              <p className="text-sm text-gray-700">
+                AI analyzes bytecode 🤖
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg p-3 mb-4">
+            <h4 className="font-semibold mb-2 text-xs text-gray-900">What happens:</h4>
+            <ol className="text-xs text-gray-700 space-y-1 list-decimal list-inside">
+              <li>Approve 69,420 USDC to malicious contract</li>
+              <li>AI fetches & analyzes bytecode</li>
+              <li>Detects: drain functions, backdoors</li>
+              <li>Risk Score: 95/100 → REVOKED! 🔥</li>
+            </ol>
+          </div>
+
+          {error2 && (
+            <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded-lg text-red-600 text-xs">
+              {error2}
+            </div>
+          )}
+
+          {success2 && (
+            <div className="mb-3 p-2 bg-green-50 border border-green-200 rounded-lg text-green-600 text-xs">
+              ✅ Created! AI is analyzing bytecode...
+            </div>
+          )}
+
+          <button
+            onClick={createMaliciousApproval}
+            disabled={loading2 || !userAddress}
+            className="w-full px-4 py-2.5 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+          >
+            {loading2 && <Loader2 className="w-4 h-4 animate-spin" />}
+            {loading2 ? 'Creating...' : 'Approve 69,420 USDC (AI Test)'}
+          </button>
+
+          <p className="mt-2 text-xs text-gray-600 text-center">
+            Spender: {MALICIOUS_CONTRACT.slice(0, 10)}...
           </p>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg p-4 mb-4">
-        <h4 className="font-semibold mb-2 text-sm text-gray-900">What happens:</h4>
-        <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
-          <li>You approve unlimited tokens to a suspicious address</li>
-          <li>ShieldAI detects the threat in real-time</li>
-          <li>The approval is automatically revoked</li>
-          <li>You see it turn red in your dashboard!</li>
-        </ol>
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <p className="text-sm text-blue-900 text-center">
+          <strong>💡 Pro Tip:</strong> These create real on-chain transactions. ShieldAI will detect and auto-revoke them in seconds!
+        </p>
       </div>
-
-      {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
-          {error}
-        </div>
-      )}
-
-      {success && (
-        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-600 text-sm">
-          ✅ Approval created! Watch it get revoked by ShieldAI...
-        </div>
-      )}
-
-      <button
-        onClick={createMockApproval}
-        disabled={loading || !userAddress}
-        className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-      >
-        {loading && <Loader2 className="w-5 h-5 animate-spin" />}
-        {loading ? 'Creating Approval...' : 'Create Mock Unlimited Approval'}
-      </button>
-
-      <p className="mt-3 text-xs text-gray-600 text-center font-medium">
-        This creates a real on-chain transaction that ShieldAI will detect and revoke
-      </p>
     </div>
   )
 }

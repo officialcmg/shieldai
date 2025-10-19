@@ -17,7 +17,7 @@ import { monadTestnet } from '@/lib/constants'
 const USER_APPROVALS_SUBSCRIPTION = gql`
   subscription UserApprovals($userAddress: String!) {
     CurrentApproval(
-      where: { owner: { _eq: $userAddress }, isRevocation: { _eq: false } }
+      where: { owner: { _eq: $userAddress } }
       order_by: { timestamp: desc }
     ) {
       id

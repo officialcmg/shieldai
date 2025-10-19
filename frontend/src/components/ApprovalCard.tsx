@@ -68,7 +68,7 @@ export function ApprovalCard({
         <div>
           {isRevoked ? (
             <div className="flex items-center gap-2 px-3 py-1.5 bg-red-500 text-white rounded-lg text-sm font-semibold">
-              <AlertCircle className="w-4 h-4" />
+              <span className="text-lg">🔥</span>
               <span>REVOKED</span>
             </div>
           ) : (
