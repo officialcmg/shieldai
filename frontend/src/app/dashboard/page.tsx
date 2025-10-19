@@ -33,11 +33,17 @@ export default function DashboardPage() {
   const { wallets } = useWallets()
   const router = useRouter()
 
-  const userAddress = wallets[0]?.address?.toLowerCase()
+  // Get SMART ACCOUNT address from localStorage (not EOA!)
+  const smartAccountAddress = typeof window !== 'undefined' 
+    ? localStorage.getItem('shieldai_smart_account')?.toLowerCase()
+    : null
 
+  const eoaAddress = wallets[0]?.address?.toLowerCase()
+
+  // Use smart account address for monitoring approvals
   const { data, loading, error } = useSubscription<UserApprovalsData>(USER_APPROVALS_SUBSCRIPTION, {
-    variables: { userAddress: userAddress || '' },
-    skip: !userAddress,
+    variables: { userAddress: smartAccountAddress || '' },
+    skip: !smartAccountAddress,
   })
 
   // Redirect to home if not authenticated (no hydration error!)
@@ -61,7 +67,12 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} onLogout={logout} />
+      <Header 
+        user={user} 
+        onLogout={logout} 
+        smartAccountAddress={smartAccountAddress}
+        eoaAddress={eoaAddress}
+      />
 
       <main className="max-w-4xl mx-auto px-4 py-8">
         {/* Title */}
@@ -116,7 +127,7 @@ export default function DashboardPage() {
         )}
 
         {/* Demo Section */}
-        <DemoSection userAddress={userAddress || ''} />
+        <DemoSection userAddress={smartAccountAddress || ''} />
       </main>
     </div>
   )

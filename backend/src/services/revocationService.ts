@@ -1,6 +1,7 @@
-import { createWalletClient, http, encodeFunctionData, type Address } from 'viem';
+import { createWalletClient, http, encodeFunctionData, type Address, createPublicClient, zeroAddress } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
-import { createExecution, ExecutionMode, getDeleGatorEnvironment } from '@metamask/delegation-toolkit';
+import { createBundlerClient, createPaymasterClient } from 'viem/account-abstraction';
+import { createExecution, ExecutionMode, getDeleGatorEnvironment, Implementation, toMetaMaskSmartAccount } from '@metamask/delegation-toolkit';
 import { DelegationManager } from '@metamask/delegation-toolkit/contracts';
 import { getDelegation } from '../db/delegations.js';
 
@@ -17,6 +18,9 @@ const MONAD_TESTNET = {
     decimals: 18,
   },
 };
+
+// Pimlico bundler URL
+const PIMLICO_BUNDLER_URL = `https://api.pimlico.io/v2/${MONAD_TESTNET.id}/rpc?apikey=${process.env.PIMLICO_API_KEY}`;
 
 interface RevokeParams {
   userAddress: string;
@@ -38,17 +42,67 @@ export async function revokeApproval(params: RevokeParams): Promise<string> {
     throw new Error(`No delegation found for user ${userAddress}`);
   }
 
-  // Step 2: Create wallet client for ShieldAI backend
+  // Step 2: Create clients
   const account = privateKeyToAccount(process.env.SHIELD_AI_PRIVATE_KEY as `0x${string}`);
+  
   const walletClient = createWalletClient({
     account,
     chain: MONAD_TESTNET,
     transport: http(),
   });
 
-  console.log(`   ShieldAI wallet: ${account.address}`);
+  const publicClient = createPublicClient({
+    chain: MONAD_TESTNET,
+    transport: http(),
+  });
 
-  // Step 3: Create execution to revoke approval (set approval to 0)
+  // Create bundler and paymaster clients
+  const bundlerClient = createBundlerClient({
+    client: publicClient,
+    transport: http(PIMLICO_BUNDLER_URL),
+  });
+
+  const paymasterClient = createPaymasterClient({
+    transport: http(PIMLICO_BUNDLER_URL),
+  });
+
+  console.log(`   ShieldAI EOA: ${account.address}`);
+  console.log(`   💰 Using Pimlico paymaster for gasless revocation!`);
+
+  // Step 3: Authorize EIP-7702 delegation (upgrade EOA to smart account)
+  console.log(`   🔐 Authorizing EIP-7702 delegation...`);
+  const environment = getDeleGatorEnvironment(MONAD_TESTNET.id);
+  const contractAddress = environment.implementations.EIP7702StatelessDeleGatorImpl;
+
+  const authorization = await walletClient.signAuthorization({
+    account,
+    contractAddress,
+    executor: 'self',
+  });
+
+  // Step 4: Submit the authorization (upgrade the EOA)
+  console.log(`   📤 Submitting EIP-7702 authorization...`);
+  const authHash = await walletClient.sendTransaction({
+    authorizationList: [authorization],
+    data: '0x',
+    to: zeroAddress,
+  });
+
+  console.log(`   ✅ EOA upgraded to smart account! TX: ${authHash}`);
+  console.log(`   📍 ShieldAI Smart Account Address (same as EOA): ${account.address}`);
+
+  // Step 5: Create ShieldAI smart account instance (using SAME address as EOA)
+  console.log(`   🏗️  Creating smart account instance...`);
+  const shieldAISmartAccount = await toMetaMaskSmartAccount({
+    client: publicClient,
+    implementation: Implementation.Stateless7702, // ← EIP-7702!
+    address: account.address, // ← SAME address as EOA!
+    signer: { walletClient },
+  });
+
+  console.log(`   ✅ Smart account ready: ${shieldAISmartAccount.address}`);
+
+  // Step 6: Create execution to revoke approval (set approval to 0)
   const revokeCalldata = encodeFunctionData({
     abi: [
       {
@@ -66,20 +120,14 @@ export async function revokeApproval(params: RevokeParams): Promise<string> {
     args: [spender as Address, BigInt(0)], // Set approval to 0
   });
 
+  // Step 7: Create execution to revoke approval
   const execution = createExecution({
     target: tokenAddress as Address,
     value: BigInt(0),
     callData: revokeCalldata,
   });
 
-  // Step 4: Get DelegationManager address
-  const environment = getDeleGatorEnvironment(MONAD_TESTNET.id);
-  const delegationManagerAddress = environment.DelegationManager;
-
-  console.log(`   DelegationManager: ${delegationManagerAddress}`);
-
-  // Step 5: Prepare redemption calldata
-  // Convert delegation to proper format with Address types
+  // Step 8: Prepare redemption calldata
   const typedDelegation = {
     delegate: delegation.delegate as Address,
     delegator: delegation.delegator as Address,
@@ -95,16 +143,31 @@ export async function revokeApproval(params: RevokeParams): Promise<string> {
     executions: [[execution]],
   });
 
-  // Step 6: Send transaction
-  console.log(`   Sending revocation transaction...`);
+  // Step 9: Send user operation with paymaster (GASLESS!)
+  console.log(`   🚀 Sending GASLESS revocation via ERC-4337...`);
   
-  const txHash = await walletClient.sendTransaction({
-    to: delegationManagerAddress,
-    data: redeemCalldata,
-    chain: MONAD_TESTNET,
+  const userOpHash = await bundlerClient.sendUserOperation({
+    account: shieldAISmartAccount,
+    calls: [
+      {
+        to: shieldAISmartAccount.address,
+        data: redeemCalldata,
+        value: BigInt(0),
+      },
+    ],
+    paymaster: paymasterClient, // ← PAYMASTER SPONSORS GAS!
   });
 
-  console.log(`   Transaction sent: ${txHash}`);
+  console.log(`   User operation sent: ${userOpHash}`);
+  console.log(`   Waiting for confirmation...`);
 
-  return txHash;
+  // Step 10: Wait for user operation receipt
+  const receipt = await bundlerClient.waitForUserOperationReceipt({
+    hash: userOpHash,
+  });
+
+  console.log(`   ✅ Revocation confirmed!`);
+  console.log(`   TX Hash: ${receipt.receipt.transactionHash}`);
+
+  return receipt.receipt.transactionHash;
 }

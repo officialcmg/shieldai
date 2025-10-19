@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import { Zap, Loader2 } from 'lucide-react'
-import { createWalletClient, custom, encodeFunctionData, maxUint256 } from 'viem'
+import { createWalletClient, custom, createPublicClient, http } from 'viem'
+import { Implementation, toMetaMaskSmartAccount } from '@metamask/delegation-toolkit'
+import { makeUnlimitedApproval } from '@/lib/metamask'
 import { monadTestnet } from '@/lib/constants'
 
 interface DemoSectionProps {
@@ -30,49 +32,59 @@ export function DemoSection({ userAddress }: DemoSectionProps) {
     setSuccess(false)
 
     try {
+      console.log('🎭 Creating unlimited approval from SMART ACCOUNT...')
+      console.log('   Smart Account Address:', userAddress)
+
+      // 1. Get EOA address from MetaMask
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' }) as string[]
+      const eoaAddress = accounts[0]
+      
+      console.log('   EOA Owner:', eoaAddress)
+
+      // 2. Create wallet client with EOA account
       const walletClient = createWalletClient({
-        account: userAddress as `0x${string}`,
+        account: eoaAddress as `0x${string}`,
         chain: monadTestnet,
         transport: custom(window.ethereum),
       })
 
-      console.log('Creating unlimited approval...')
-
-      // Encode approve function call
-      const data = encodeFunctionData({
-        abi: [
-          {
-            name: 'approve',
-            type: 'function',
-            stateMutability: 'nonpayable',
-            inputs: [
-              { name: 'spender', type: 'address' },
-              { name: 'amount', type: 'uint256' },
-            ],
-            outputs: [{ type: 'bool' }],
-          },
-        ],
-        functionName: 'approve',
-        args: [SUSPICIOUS_SPENDER, maxUint256],
+      // 3. Create public client
+      const publicClient = createPublicClient({
+        chain: monadTestnet,
+        transport: http(),
       })
 
-      // Send transaction
-      const hash = await walletClient.sendTransaction({
-        to: DEMO_TOKEN_ADDRESS as `0x${string}`,
-        data,
+      // 4. Recreate smart account instance
+      console.log('   Recreating smart account instance...')
+      const smartAccount = await toMetaMaskSmartAccount({
+        client: publicClient,
+        implementation: Implementation.Hybrid,
+        address: userAddress as `0x${string}`, // Smart account address
+        signer: { walletClient }, // EOA wallet client
       })
 
-      console.log('Transaction sent:', hash)
+      console.log('   ✅ Smart account ready!')
+
+      // 4. Make unlimited approval via ERC-4337 user operation
+      const txHash = await makeUnlimitedApproval(
+        smartAccount,
+        DEMO_TOKEN_ADDRESS,
+        SUSPICIOUS_SPENDER
+      )
+
+      console.log('✅ Unlimited approval created!')
+      console.log('   TX Hash:', txHash)
       setSuccess(true)
 
       // The approval will be:
-      // 1. Caught by Envio indexer
+      // 1. Caught by Envio indexer (monitors smart account address)
       // 2. Stored in CurrentApproval
-      // 3. Sent to backend for threat detection
-      // 4. Auto-revoked by ShieldAI!
-      // 5. UI will show it turn red via subscription
+      // 3. Sent to backend webhook for threat detection
+      // 4. AI detects: UNLIMITED approval = THREAT!
+      // 5. Backend redeems delegation to revoke
+      // 6. UI shows it turn red via GraphQL subscription! 🛡️
     } catch (err: any) {
-      console.error(err)
+      console.error('❌ Demo approval failed:', err)
       setError(err.message || 'Failed to create approval')
     } finally {
       setLoading(false)

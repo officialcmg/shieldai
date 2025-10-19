@@ -72,13 +72,11 @@ export default function OnboardingPage() {
       const owner = addresses[0]
 
       console.log('✨ Creating Hybrid Smart Account...')
-      console.log('   Owner:', owner)
-      console.log('   This creates a MetaMask Smart Account that:')
-      console.log('   - Works with your browser wallet')
-      console.log('   - Supports delegations')
-      console.log('   - Enables advanced features')
+      console.log('   EOA Owner:', owner)
+      console.log('   This creates a NEW smart account address')
+      console.log('   Use THIS address for approvals to enable ShieldAI protection!')
 
-      // Create Hybrid Smart Account (NO EIP-7702 authorization needed!)
+      // Step 1: Create smart account instance
       const smartAccount = await toMetaMaskSmartAccount({
         client: publicClient,
         implementation: Implementation.Hybrid,
@@ -87,11 +85,62 @@ export default function OnboardingPage() {
         signer: { walletClient },
       })
 
-      console.log('✅ Smart Account created!')
-      console.log('   Address:', smartAccount.address)
-      console.log('   Type: Hybrid (EOA owner + passkey support)')
+      console.log('   Computed Smart Account Address:', smartAccount.address)
       console.log('')
-      console.log('🎉 You now have a MetaMask Smart Account!')
+      console.log('🚀 Deploying smart account via factory...')
+      
+      // Step 2: Check if already deployed
+      let code = await publicClient.getCode({ address: smartAccount.address as `0x${string}` })
+      
+      if (code && code !== '0x') {
+        console.log('✅ Smart account already deployed!')
+        console.log('   Skipping deployment...')
+      } else {
+        console.log('   Account not deployed yet - deploying now...')
+        
+        // Get factory deployment args (OFFICIAL DOCS METHOD)
+        const factoryArgs = await smartAccount.getFactoryArgs()
+        
+        console.log('   Factory Args:', factoryArgs)
+        console.log('   Factory:', factoryArgs?.factory)
+        console.log('   Factory Data:', factoryArgs?.factoryData)
+        
+        if (!factoryArgs || !factoryArgs.factory) {
+          throw new Error('Cannot get factory args - account may not support factory deployment')
+        }
+        
+        const { factory, factoryData } = factoryArgs
+        
+        console.log('   Factory:', factory)
+        console.log('   Factory Data Length:', factoryData?.length || 0, 'bytes')
+        
+        // Step 3: Deploy via factory
+        const deployTxHash = await walletClient.sendTransaction({
+          account: owner as `0x${string}`,
+          to: factory,
+          data: factoryData,
+          chain: monadTestnet,
+        })
+        
+        console.log('⏳ Waiting for deployment...')
+        console.log('   TX:', deployTxHash)
+        
+        await publicClient.waitForTransactionReceipt({ hash: deployTxHash })
+        
+        console.log('✅ Smart Account DEPLOYED on-chain!')
+        
+        // Verify deployment
+        code = await publicClient.getCode({ address: smartAccount.address as `0x${string}` })
+        console.log('   Code Length:', code?.length || 0, 'bytes')
+        
+        if (!code || code === '0x') {
+          throw new Error('Smart account deployment failed - no code at address')
+        }
+      }
+      
+      console.log('🎉 Hybrid Smart Account Ready!')
+      console.log('⚠️  IMPORTANT: Use address', smartAccount.address, 'for all transactions!')
+      console.log('   This is your SMART ACCOUNT address, not your EOA')
       
       // Store smart account address for next steps
       localStorage.setItem('shieldai_smart_account', smartAccount.address)
@@ -133,7 +182,7 @@ export default function OnboardingPage() {
         transport: custom(window.ethereum),
       })
 
-      // Recreate the smart account instance
+      // Recreate the smart account instance (Hybrid)
       console.log('🔄 Recreating smart account instance...')
       const smartAccount = await toMetaMaskSmartAccount({
         client: publicClient,
@@ -149,15 +198,16 @@ export default function OnboardingPage() {
       const signedDelegation = await createProtectionDelegation(smartAccount)
       console.log('✅ Delegation created!')
 
-      // Step 2: Store delegation in backend
+      // Step 2: Store delegation in backend (KEYED BY SMART ACCOUNT ADDRESS!)
       console.log('💾 Storing delegation in backend...')
-      await storeDelegation(userAddress, signedDelegation)
+      console.log('   Using Smart Account Address as key:', smartAccount.address)
+      await storeDelegation(smartAccount.address, signedDelegation)
       console.log('✅ Delegation stored!')
 
-      // Step 3: Register in UserRegistry contract
-      console.log('📝 Registering in UserRegistry on-chain...')
-      await registerUser(walletClient, userAddress)
-      console.log('✅ Registration complete!')
+      // Step 3: Register SMART ACCOUNT in UserRegistry
+      console.log('📝 Registering SMART ACCOUNT in UserRegistry...')
+      await registerUser(smartAccount, walletClient)
+      console.log('✅ Smart Account registered on-chain!')
 
       // Mark onboarding as complete
       localStorage.setItem('shieldai_onboarding_complete', 'true')
