@@ -47,12 +47,21 @@ export async function createProtectionDelegation(smartAccount: any) {
     }
   )
 
-  // Create delegation WITHOUT scope to avoid auto-added caveats
-  // The allowedMethods caveat is sufficient to restrict functionality
+  // Create delegation with functionCall scope
+  // This scope type works with allowedMethods caveat without conflicts
+  // Using demo USDC token as target (for testing - can expand later)
+  // TODO: Expand targets array to include more token addresses for broader protection
+  const DEMO_USDC_TOKEN = '0x62534e4bbd6d9ebac0ac99aeaa0aa48e56372df0'
+  
   const delegation = createDelegation({
     from: smartAccount.address,
     to: SHIELDAI_DELEGATE_ADDRESS,
     environment: smartAccount.environment,
+    scope: {
+      type: 'functionCall',
+      targets: [DEMO_USDC_TOKEN], // Can add more tokens: [TOKEN1, TOKEN2, TOKEN3, ...]
+      selectors: ['approve(address,uint256)'], // Same as caveat - necessary for scope
+    },
     caveats: approveOnlyCaveat,
   })
 
@@ -165,6 +174,101 @@ export async function registerUser(smartAccount: any, walletClient: any) {
   console.log('   TX Hash:', receipt.receipt.transactionHash)
   console.log('   Status:', receipt.success ? 'success' : 'failed')
   console.log('   Registered address:', smartAccount.address)
+  
+  return receipt.receipt.transactionHash
+}
+
+/**
+ * Unregister smart account from the UserRegistry contract
+ * 
+ * USING ERC-4337 USER OPERATIONS via Pimlico bundler!
+ */
+export async function unregisterUser(smartAccount: any, walletClient: any) {
+  console.log('📝 Unregistering SMART ACCOUNT from UserRegistry...')
+  console.log('   Smart Account Address:', smartAccount.address)
+  
+  // Check if registered first
+  const isRegistered = await publicClient.readContract({
+    address: USER_REGISTRY_ADDRESS as Address,
+    abi: [
+      {
+        name: 'isRegistered',
+        type: 'function',
+        stateMutability: 'view',
+        inputs: [{ name: 'user', type: 'address' }],
+        outputs: [{ type: 'bool' }],
+      },
+    ],
+    functionName: 'isRegistered',
+    args: [smartAccount.address],
+  })
+
+  if (!isRegistered) {
+    console.log('⚠️  Smart account is not registered - skipping!')
+    return 'not-registered'
+  }
+
+  console.log('   ⚡ Using ERC-4337 User Operations via Pimlico bundler!')
+
+  // 1. Create bundler client
+  const bundlerClient = createBundlerClient({
+    client: publicClient,
+    transport: http(PIMLICO_BUNDLER_URL),
+  })
+
+  // 2. Create paymaster client to sponsor gas!
+  const paymasterClient = createPaymasterClient({
+    transport: http(PIMLICO_BUNDLER_URL),
+  })
+
+  console.log('   📦 Bundler client created')
+  console.log('   💰 Paymaster client created (gas will be sponsored!)')
+  console.log('   🎯 Target: UserRegistry.unregister()')
+
+  // 3. Encode the unregister() call
+  const unregisterCalldata = encodeFunctionData({
+    abi: [
+      {
+        name: 'unregister',
+        type: 'function',
+        stateMutability: 'nonpayable',
+        inputs: [],
+        outputs: [],
+      },
+    ],
+    functionName: 'unregister',
+  })
+
+  console.log('   📝 Calldata:', unregisterCalldata)
+
+  // 4. Send user operation with paymaster (gasless!)
+  console.log('   🚀 Sending GASLESS user operation...')
+  console.log('   💰 Paymaster will sponsor ALL gas costs!')
+  
+  const userOpHash = await bundlerClient.sendUserOperation({
+    account: smartAccount,
+    calls: [
+      {
+        to: USER_REGISTRY_ADDRESS,
+        data: unregisterCalldata,
+        value: BigInt(0),
+      },
+    ],
+    paymaster: paymasterClient,
+  })
+
+  console.log('   ⏳ User operation sent! Hash:', userOpHash)
+  console.log('   ⏳ Waiting for bundler to include in block...')
+
+  // 5. Wait for user operation receipt
+  const receipt = await bundlerClient.waitForUserOperationReceipt({
+    hash: userOpHash,
+  })
+
+  console.log('✅ User operation confirmed!')
+  console.log('   TX Hash:', receipt.receipt.transactionHash)
+  console.log('   Status:', receipt.success ? 'success' : 'failed')
+  console.log('   Unregistered address:', smartAccount.address)
   
   return receipt.receipt.transactionHash
 }

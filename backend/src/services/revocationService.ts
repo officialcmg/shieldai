@@ -131,12 +131,17 @@ export async function revokeApproval(params: RevokeParams): Promise<string> {
     callData: revokeCalldata,
   });
 
-  // Step 8: Prepare redemption calldata
+  // Step 8: Prepare redemption calldata with proper types
   const typedDelegation = {
     delegate: delegation.delegate as Address,
     delegator: delegation.delegator as Address,
     authority: delegation.authority as Address,
-    caveats: delegation.caveats,
+    caveats: delegation.caveats.map(caveat => ({
+      ...caveat,
+      enforcer: caveat.enforcer as Address,
+      terms: caveat.terms as `0x${string}`,
+      args: caveat.args as `0x${string}`,
+    })),
     salt: delegation.salt as `0x${string}`,
     signature: delegation.signature as `0x${string}`,
   };
