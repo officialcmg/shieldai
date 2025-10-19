@@ -73,10 +73,11 @@ export async function revokeApproval(params: RevokeParams): Promise<string> {
   console.log(`   🔍 Checking if EOA is already upgraded...`);
   const code = await publicClient.getCode({ address: account.address });
   
+  const environment = getDeleGatorEnvironment(MONAD_TESTNET.id);
+  
   if (!code || code === '0x' || code === '0x0') {
     // EOA not upgraded yet, authorize EIP-7702 delegation
     console.log(`   🔐 EOA not upgraded yet, authorizing EIP-7702 delegation...`);
-    const environment = getDeleGatorEnvironment(MONAD_TESTNET.id);
     const contractAddress = environment.implementations.EIP7702StatelessDeleGatorImpl;
 
     const authorization = await walletClient.signAuthorization({
@@ -100,16 +101,10 @@ export async function revokeApproval(params: RevokeParams): Promise<string> {
   
   console.log(`   📍 ShieldAI Smart Account Address (same as EOA): ${account.address}`);
 
-  // Step 5: Create ShieldAI smart account instance (using SAME address as EOA)
-  console.log(`   🏗️  Creating smart account instance...`);
-  const shieldAISmartAccount = await toMetaMaskSmartAccount({
-    client: publicClient,
-    implementation: Implementation.Stateless7702, // ← EIP-7702!
-    address: account.address, // ← SAME address as EOA!
-    signer: { walletClient },
-  });
-
-  console.log(`   ✅ Smart account ready: ${shieldAISmartAccount.address}`);
+  // Step 5: Get DelegationManager address
+  console.log(`   📍 Getting DelegationManager address...`);
+  const delegationManagerAddress = environment.DelegationManager;
+  console.log(`   DelegationManager: ${delegationManagerAddress}`);
 
   // Step 6: Create execution to revoke approval (set approval to 0)
   const revokeCalldata = encodeFunctionData({
@@ -152,33 +147,26 @@ export async function revokeApproval(params: RevokeParams): Promise<string> {
     executions: [[execution]],
   });
 
-  // Step 9: Send user operation with paymaster (GASLESS!)
-  console.log(`   🚀 Sending GASLESS revocation via ERC-4337...`);
+  // Step 9: Send regular transaction
+  console.log(`   🚀 Sending revocation transaction...`);
   
-  const userOpHash = await bundlerClient.sendUserOperation({
-    account: shieldAISmartAccount,
-    calls: [
-      {
-        to: shieldAISmartAccount.address,
-        data: redeemCalldata,
-        value: BigInt(0),
-      },
-    ],
-    paymaster: paymasterClient, // ← PAYMASTER SPONSORS GAS!
-    factory: undefined, // EIP-7702 accounts don't use factory deployment
-    factoryData: undefined, // Already deployed via authorization
+  const txHash = await walletClient.sendTransaction({
+    to: delegationManagerAddress,
+    data: redeemCalldata,
+    chain: MONAD_TESTNET,
   });
 
-  console.log(`   User operation sent: ${userOpHash}`);
+  console.log(`   ✅ Revocation transaction sent!`);
+  console.log(`   TX Hash: ${txHash}`);
   console.log(`   Waiting for confirmation...`);
 
-  // Step 10: Wait for user operation receipt
-  const receipt = await bundlerClient.waitForUserOperationReceipt({
-    hash: userOpHash,
+  // Step 10: Wait for transaction receipt
+  const receipt = await publicClient.waitForTransactionReceipt({
+    hash: txHash,
   });
 
   console.log(`   ✅ Revocation confirmed!`);
-  console.log(`   TX Hash: ${receipt.receipt.transactionHash}`);
+  console.log(`   Block: ${receipt.blockNumber}`);
 
-  return receipt.receipt.transactionHash;
+  return txHash;
 }
