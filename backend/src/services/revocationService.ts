@@ -165,6 +165,8 @@ export async function revokeApproval(params: RevokeParams): Promise<string> {
       },
     ],
     paymaster: paymasterClient, // ← PAYMASTER SPONSORS GAS!
+    factory: undefined, // EIP-7702 accounts don't use factory deployment
+    factoryData: undefined, // Already deployed via authorization
   });
 
   console.log(`   User operation sent: ${userOpHash}`);
