@@ -47,6 +47,23 @@ export default function DashboardPage() {
 
   const eoaAddress = wallets[0]?.address?.toLowerCase()
 
+  // Handle logout with localStorage cleanup
+  const handleLogout = async () => {
+    console.log('🚪 Logging out and clearing localStorage...')
+    
+    // Clear ShieldAI localStorage items
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('shieldai_onboarding_complete')
+      localStorage.removeItem('shieldai_smart_account')
+      console.log('✅ Cleared shieldai_onboarding_complete')
+      console.log('✅ Cleared shieldai_smart_account')
+    }
+    
+    // Call Privy logout
+    await logout()
+    console.log('✅ Logged out from Privy')
+  }
+
   // Use smart account address for monitoring approvals
   const { data, loading, error } = useSubscription<UserApprovalsData>(USER_APPROVALS_SUBSCRIPTION, {
     variables: { userAddress: smartAccountAddress || '' },
@@ -168,7 +185,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gray-50">
       <Header 
         user={user} 
-        onLogout={logout} 
+        onLogout={handleLogout} 
         smartAccountAddress={smartAccountAddress}
         eoaAddress={eoaAddress}
       />

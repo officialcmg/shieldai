@@ -13,17 +13,34 @@ import {
   registerUser,
   storeDelegation,
 } from '@/lib/metamask'
+import { Header } from '@/components/Header'
 
 type Step = 1 | 2 | 3 | 4
 
 export default function OnboardingPage() {
-  const { authenticated, user } = usePrivy()
+  const { authenticated, user, logout } = usePrivy()
   const { wallets } = useWallets()
   const { signAuthorization } = useSign7702Authorization()
   const router = useRouter()
   const [step, setStep] = useState<Step>(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>('')
+
+  // Handle logout with localStorage cleanup
+  const handleLogout = async () => {
+    console.log('🚪 Logging out from onboarding...')
+    
+    // Clear ShieldAI localStorage items
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('shieldai_onboarding_complete')
+      localStorage.removeItem('shieldai_smart_account')
+      console.log('✅ Cleared localStorage')
+    }
+    
+    // Call Privy logout
+    await logout()
+    console.log('✅ Logged out - redirecting to home')
+  }
 
   // Redirect to home if not authenticated (no hydration error!)
   useEffect(() => {
@@ -230,8 +247,15 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-50 flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-50">
+      <Header 
+        user={user} 
+        onLogout={handleLogout}
+        smartAccountAddress={null}
+        eoaAddress={wallets[0]?.address}
+      />
+      <div className="flex items-center justify-center p-4 pt-8">
+        <div className="max-w-2xl w-full">
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
@@ -387,6 +411,7 @@ export default function OnboardingPage() {
               </div>
             </>
           )}
+        </div>
         </div>
       </div>
     </div>
