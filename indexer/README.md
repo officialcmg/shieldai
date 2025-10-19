@@ -199,7 +199,7 @@ subscription UserApprovals($userAddress: String!) {
 ## 🌐 Deployed Contracts
 
 - **UserRegistry**: `0x2CC70f80098e20717D480270187DCb0c1Ccf826e`
-- **Network**: Monad Testnet (Chain ID: 41454)
+- **Network**: Monad Testnet (Chain ID: 10143)
 - **RPC**: `https://testnet-rpc.monad.xyz`
 - **Start Block**: 43620720
 
