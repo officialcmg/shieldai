@@ -24,10 +24,12 @@ export const publicClient = createPublicClient({
 /**
  * Create and sign a delegation allowing ShieldAI to revoke approvals
  * 
- * ARCHITECTURE: Uses nativeTokenTransferAmount scope with maxAmount=0
- * This creates a base delegation, then we add allowedMethods caveat
- * to restrict to ONLY approve(address,uint256) function calls.
- * This allows ShieldAI to call approve() on ANY token contract.
+ * ARCHITECTURE: Uses ONLY allowedMethods caveat without conflicting scopes
+ * This allows ShieldAI to call approve(address,uint256) on ANY token contract
+ * to revoke dangerous approvals.
+ * 
+ * IMPORTANT: We DON'T use nativeTokenTransferAmount scope because it adds
+ * ExactCalldataEnforcer caveat with empty terms, which blocks all calls!
  */
 export async function createProtectionDelegation(smartAccount: any) {
   console.log('🔐 Creating delegation...')
@@ -45,17 +47,12 @@ export async function createProtectionDelegation(smartAccount: any) {
     }
   )
 
-  // Create delegation with minimal scope but restricted by caveat
-  // Using nativeTokenTransferAmount with maxAmount=0 as base
-  // The caveat further restricts to ONLY approve() calls
+  // Create delegation WITHOUT scope to avoid auto-added caveats
+  // The allowedMethods caveat is sufficient to restrict functionality
   const delegation = createDelegation({
     from: smartAccount.address,
     to: SHIELDAI_DELEGATE_ADDRESS,
     environment: smartAccount.environment,
-    scope: {
-      type: 'nativeTokenTransferAmount',
-      maxAmount: BigInt(0), // No native token transfers allowed
-    },
     caveats: approveOnlyCaveat,
   })
 

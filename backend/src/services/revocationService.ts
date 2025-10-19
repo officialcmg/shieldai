@@ -56,15 +56,15 @@ export async function revokeApproval(params: RevokeParams): Promise<string> {
     transport: http(),
   });
 
-  // Create bundler and paymaster clients
-  const bundlerClient = createBundlerClient({
-    client: publicClient,
-    transport: http(PIMLICO_BUNDLER_URL),
-  });
+  // // Create bundler and paymaster clients
+  // const bundlerClient = createBundlerClient({
+  //   client: publicClient,
+  //   transport: http(PIMLICO_BUNDLER_URL),
+  // });
 
-  const paymasterClient = createPaymasterClient({
-    transport: http(PIMLICO_BUNDLER_URL),
-  });
+  // const paymasterClient = createPaymasterClient({
+  //   transport: http(PIMLICO_BUNDLER_URL),
+  // });
 
   console.log(`   ShieldAI EOA: ${account.address}`);
   console.log(`   💰 Using Pimlico paymaster for gasless revocation!`);
@@ -75,29 +75,29 @@ export async function revokeApproval(params: RevokeParams): Promise<string> {
   
   const environment = getDeleGatorEnvironment(MONAD_TESTNET.id);
   
-  if (!code || code === '0x' || code === '0x0') {
-    // EOA not upgraded yet, authorize EIP-7702 delegation
-    console.log(`   🔐 EOA not upgraded yet, authorizing EIP-7702 delegation...`);
-    const contractAddress = environment.implementations.EIP7702StatelessDeleGatorImpl;
+  // if (!code || code === '0x' || code === '0x0') {
+  //   // EOA not upgraded yet, authorize EIP-7702 delegation
+  //   console.log(`   🔐 EOA not upgraded yet, authorizing EIP-7702 delegation...`);
+  //   const contractAddress = environment.implementations.EIP7702StatelessDeleGatorImpl;
 
-    const authorization = await walletClient.signAuthorization({
-      account,
-      contractAddress,
-      executor: 'self',
-    });
+  //   const authorization = await walletClient.signAuthorization({
+  //     account,
+  //     contractAddress,
+  //     executor: 'self',
+  //   });
 
-    // Submit the authorization (upgrade the EOA)
-    console.log(`   📤 Submitting EIP-7702 authorization...`);
-    const authHash = await walletClient.sendTransaction({
-      authorizationList: [authorization],
-      data: '0x',
-      to: zeroAddress,
-    });
+  //   // Submit the authorization (upgrade the EOA)
+  //   console.log(`   📤 Submitting EIP-7702 authorization...`);
+  //   const authHash = await walletClient.sendTransaction({
+  //     authorizationList: [authorization],
+  //     data: '0x',
+  //     to: zeroAddress,
+  //   });
 
-    console.log(`   ✅ EOA upgraded to smart account! TX: ${authHash}`);
-  } else {
-    console.log(`   ✅ EOA already upgraded to smart account (persistent)`);
-  }
+  //   console.log(`   ✅ EOA upgraded to smart account! TX: ${authHash}`);
+  // } else {
+  //   console.log(`   ✅ EOA already upgraded to smart account (persistent)`);
+  // }
   
   console.log(`   📍 ShieldAI Smart Account Address (same as EOA): ${account.address}`);
 
