@@ -15,8 +15,8 @@ out/
 cache/
 broadcast/
 
-# Foundry
-lib/
+# Foundry (only ignore Foundry's lib directory in contracts)
+contracts/lib/
 *.log
 lcov.info
 

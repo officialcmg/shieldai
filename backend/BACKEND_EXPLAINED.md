@@ -317,7 +317,7 @@ In Railway dashboard, add:
 ```
 NODE_ENV=production
 MONAD_RPC_URL=https://testnet-rpc.monad.xyz
-MONAD_CHAIN_ID=41454
+MONAD_CHAIN_ID=10143
 SHIELD_AI_PRIVATE_KEY=your_private_key_here
 USER_REGISTRY_ADDRESS=0x2CC70f80098e20717D480270187DCb0c1Ccf826e
 ```

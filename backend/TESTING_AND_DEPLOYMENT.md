@@ -261,7 +261,7 @@ PORT=3000
 
 # Monad Configuration
 MONAD_RPC_URL=https://testnet-rpc.monad.xyz
-MONAD_CHAIN_ID=41454
+MONAD_CHAIN_ID=10143
 
 # ShieldAI Wallet (get from contracts/.env - NEVER commit actual key!)
 SHIELD_AI_PRIVATE_KEY=your_private_key_here

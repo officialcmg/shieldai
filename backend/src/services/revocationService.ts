@@ -6,7 +6,7 @@ import { getDelegation } from '../db/delegations.js';
 
 // Monad testnet configuration
 const MONAD_TESTNET = {
-  id: 41454,
+  id: 10143,
   name: 'Monad Testnet',
   rpcUrls: {
     default: { http: [process.env.MONAD_RPC_URL || 'https://testnet-rpc.monad.xyz'] },
