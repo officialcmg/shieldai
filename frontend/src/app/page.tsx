@@ -39,7 +39,7 @@ export default function Home() {
           </p>
           <p className="text-lg text-gray-500 max-w-2xl mx-auto">
             Protect yourself from malicious token approvals with real-time threat detection
-            powered by EIP-7702 & MetaMask Delegation
+            powered by MetaMask Delegation and Envio HyperIndex
           </p>
         </div>
 
