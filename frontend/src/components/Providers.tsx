@@ -52,16 +52,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <PrivyProvider
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ''}
       config={{
-        loginMethods: ['email', 'wallet', 'google'],
+        loginMethods: ['wallet'],
         appearance: {
           theme: 'light',
           accentColor: '#8B5CF6',
           logo: '/logo.png',
-        },
-        embeddedWallets: {
-          ethereum: {
-            createOnLogin: 'users-without-wallets',
-          },
         },
         defaultChain: monadTestnet,
         supportedChains: [monadTestnet],

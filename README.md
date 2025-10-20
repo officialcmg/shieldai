@@ -43,7 +43,7 @@ User stays safe! 🎉
 ## ✨ Key Features
 
 ### 🚀 For Users
-- **Zero-Friction Onboarding**: Login with email, social login, or wallet via Privy
+- **Zero-Friction Onboarding**: Connect any external wallet (MetaMask, WalletConnect, etc.)
 - **One-Click Protection**: Create MetaMask Smart Account in seconds
 - **AI-Powered Detection**: GPT-4 analyzes contract bytecode for malicious patterns
 - **Auto-Revocation**: Dangerous approvals cancelled instantly via delegations
@@ -67,7 +67,7 @@ User stays safe! 🎉
 - **Envio HyperIndex**: Real-time blockchain event monitoring with Effect API webhooks
 - **Monad Testnet**: High-performance EVM for fast threat response
 - **AI Detection**: Pattern analysis for identifying malicious contracts
-- **Privy**: Seamless wallet onboarding (email/social/wallet)
+- **Privy**: Seamless external wallet connection
 
 ## 🏛️ Architecture
 
@@ -246,7 +246,7 @@ envio deploy
 ## ✨ Features
 
 ### For Users
-- 🔐 **Seamless Onboarding**: Login with email, social, or wallet (Privy)
+- 🔐 **Seamless Onboarding**: Connect any external wallet (Privy)
 - 🎯 **Smart Account Creation**: One-click MetaMask Hybrid Smart Account
 - 📊 **Real-Time Dashboard**: See all your approvals and threats
 - ⚡ **Instant Protection**: Auto-revocation happens in milliseconds
@@ -264,7 +264,7 @@ envio deploy
 ### Quick Start (5 minutes)
 
 1. **Visit** → [https://shieldai-monad.netlify.app](https://shieldai-monad.netlify.app)
-2. **Login** → Email, social, or connect your wallet (Privy)
+2. **Connect Wallet** → MetaMask, WalletConnect, or any external wallet
 3. **Onboarding** → 4-step wizard creates your smart account
 4. **Create Smart Account** → One-click MetaMask Hybrid account deployment
 5. **Grant Delegation** → Sign once to give ShieldAI revoke permissions
