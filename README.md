@@ -6,6 +6,8 @@
 
 [![Monad](https://img.shields.io/badge/Monad-Testnet-purple)](https://testnet.monad.xyz) [![MetaMask](https://img.shields.io/badge/MetaMask-Smart_Accounts-orange)](https://metamask.io) [![Envio](https://img.shields.io/badge/Envio-HyperIndex-blue)](https://envio.dev)
 
+> ⚠️ **DISCLAIMER**: This project uses MetaMask Hybrid Smart Accounts on Monad Testnet. Delagetions can't be signed by an EOA, so we use MetaMask Delegation Toolkit to create a smart account with full delegation support. Unfortunately, we can't use EIP-7702 authorization for this demo due to viem not supporting JSON-RPC requests for EIP-7702 authorization.
+
 ## 🎯 The Problem
 
 Every year, **$1.7+ billion** is lost to crypto phishing attacks. The most common vector? **Unlimited token approvals** to malicious contracts.
