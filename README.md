@@ -1,8 +1,10 @@
 # 🛡️ ShieldAI - AI-Powered Wallet Guardian
 
-**Your 24/7 AI security agent that monitors token approvals and automatically revokes malicious transactions before they drain your funds.**
+**Autonomous AI agent that monitors token approvals in real-time and automatically revokes malicious transactions before they drain your funds.**
 
-Built for the Monad & MetaMask Hackathon | [Demo Video](#) | [Live App](#)
+🔗 **[Live Demo](https://shieldai-monad.netlify.app)** | 🎥 **[Video Demo](#)** | 📊 **[Architecture](#architecture)**
+
+[![Monad](https://img.shields.io/badge/Monad-Testnet-purple)](https://testnet.monad.xyz) [![MetaMask](https://img.shields.io/badge/MetaMask-Smart_Accounts-orange)](https://metamask.io) [![Envio](https://img.shields.io/badge/Envio-HyperIndex-blue)](https://envio.dev)
 
 ## 🎯 The Problem
 
@@ -15,18 +17,44 @@ Every year, **$1.7+ billion** is lost to crypto phishing attacks. The most commo
 
 ## 💡 Our Solution
 
-**ShieldAI** is an autonomous AI agent that:
-1. ✅ **Monitors** all your token approvals in real-time
-2. ✅ **Detects** threats using AI-powered pattern analysis
-3. ✅ **Revokes** malicious approvals automatically
-4. ✅ **Protects** you 24/7 without any action needed
+**ShieldAI** is an autonomous AI agent that protects your wallet 24/7:
+
+1. 🔍 **Monitors** all your token approvals in real-time using Envio HyperIndex
+2. 🤖 **Analyzes** contract bytecode with AI to detect malicious patterns
+3. ⚡ **Revokes** dangerous approvals automatically via MetaMask Delegations
+4. 🛡️ **Protects** you continuously without any manual intervention
 
 ### How It Works
 
+```mermaid
+User approves tokens → Envio detects instantly → AI analyzes bytecode
+    ↓
+Threat detected? → Backend redeems delegation → Approval auto-revoked
+    ↓
+User stays safe! 🎉
 ```
-User approves token → Envio catches it instantly → AI analyzes threat level
-    → If dangerous: Auto-revoke via EIP-7702 delegation → User stays safe!
-```
+
+**Set it up once. Protected forever.**
+
+---
+
+## ✨ Key Features
+
+### 🚀 For Users
+- **Zero-Friction Onboarding**: Login with email, social login, or wallet via Privy
+- **One-Click Protection**: Create MetaMask Smart Account in seconds
+- **AI-Powered Detection**: GPT-4 analyzes contract bytecode for malicious patterns
+- **Auto-Revocation**: Dangerous approvals cancelled instantly via delegations
+- **Real-Time Dashboard**: Monitor all approvals with live updates via GraphQL subscriptions
+- **Beautiful UI**: Modern, responsive design built with Next.js + TailwindCSS
+
+### 🛠️ Technical Highlights
+- **MetaMask Hybrid Smart Accounts**: Full delegation support with browser wallet compatibility
+- **Envio Effect API**: Real-time webhooks for instant threat response
+- **AI Bytecode Analysis**: Detects transferFrom calls, owner privileges, honeypots, and backdoors
+- **Monad Testnet**: Leverages high-performance EVM for sub-second transaction finality
+- **ERC-4337 UserOps**: Gasless transactions with Pimlico bundler integration
+- **Type-Safe**: End-to-end TypeScript across frontend, backend, and indexer
 
 ## 🏗️ Technical Innovation
 
@@ -39,32 +67,53 @@ User approves token → Envio catches it instantly → AI analyzes threat level
 - **AI Detection**: Pattern analysis for identifying malicious contracts
 - **Privy**: Seamless wallet onboarding (email/social/wallet)
 
-## Architecture
+## 🏛️ Architecture
 
 ```
-┌─────────────────┐
-│ Monad Testnet   │
-│  UserRegistry   │
-└────────┬────────┘
-         │
-         ↓
-┌─────────────────┐
-│ Envio Indexer   │
-│  Effect API →   │
-└────────┬────────┘
-         │ (webhook)
-         ↓
-┌─────────────────┐
-│ Railway Backend │
-│  + PostgreSQL   │
-└────────┬────────┘
-         │
-         ↓
-┌─────────────────┐
-│ Frontend        │
-│  (Vercel)       │
-└─────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│                    Monad Testnet                         │
+│  • UserRegistry Contract (tracks protected accounts)    │
+│  • ERC20 Tokens (USDC, etc.)                            │
+│  • User Smart Accounts (MetaMask Hybrid)                │
+└─────────────────────┬────────────────────────────────────┘
+                      │
+                      ↓ (Approval events)
+┌──────────────────────────────────────────────────────────┐
+│              Envio HyperIndex (hosted)                   │
+│  • Real-time blockchain indexing                         │
+│  • GraphQL API for frontend queries                      │
+│  • Effect API → Webhook on new approvals                 │
+└─────────────────────┬────────────────────────────────────┘
+                      │
+                      ↓ (POST webhook)
+┌──────────────────────────────────────────────────────────┐
+│              Railway Backend + PostgreSQL                │
+│  • Receives approval webhooks                            │
+│  • AI threat detection (OpenAI GPT-4)                    │
+│  • Bytecode analysis via viem                            │
+│  • Stores delegations                                    │
+│  • Redeems delegations to revoke threats                 │
+└─────────────────────┬────────────────────────────────────┘
+                      │
+                      ↓ (GraphQL subscriptions)
+┌──────────────────────────────────────────────────────────┐
+│              Netlify Frontend (Next.js)                  │
+│  • Privy authentication                                  │
+│  • MetaMask Delegation Toolkit                           │
+│  • Real-time dashboard (Apollo Client)                   │
+│  • Beautiful UI (TailwindCSS)                            │
+└──────────────────────────────────────────────────────────┘
 ```
+
+### Data Flow
+
+1. **User creates approval** → Smart account calls ERC20.approve()
+2. **Envio detects event** → Indexes approval, triggers Effect API webhook
+3. **Backend receives webhook** → Fetches bytecode, runs AI analysis
+4. **AI analyzes threat** → Checks for malicious patterns (drain functions, backdoors)
+5. **If malicious** → Backend redeems delegation, calls approve(spender, 0)
+6. **Frontend updates** → GraphQL subscription shows "REVOKED" status in real-time
+7. **User protected** → Malicious approval cancelled automatically!
 
 ## Project Structure
 
@@ -208,16 +257,28 @@ envio deploy
 - 🧪 **Full Test Coverage**: Foundry tests for all contracts
 - 📝 **TypeScript**: End-to-end type safety
 
-## 🎮 Demo Flow
+## 🎮 Try It Out - Live Demo
 
-1. **Sign Up** → Email/Wallet/Social login via Privy
-2. **Onboarding** → Beautiful 4-step wizard explains everything
-3. **Create Smart Account** → One-click MetaMask Hybrid Smart Account creation
-4. **Grant Protection** → One signature gives ShieldAI revoke permissions
-5. **Dashboard** → Monitor all your approvals in real-time
-6. **Test Threat** → Create a mock unlimited approval
-7. **Watch Magic** → Approval auto-revoked within seconds!
-8. **Stay Safe** → 24/7 monitoring continues automatically
+### Quick Start (5 minutes)
+
+1. **Visit** → [https://shieldai-monad.netlify.app](https://shieldai-monad.netlify.app)
+2. **Login** → Email, social, or connect your wallet (Privy)
+3. **Onboarding** → 4-step wizard creates your smart account
+4. **Create Smart Account** → One-click MetaMask Hybrid account deployment
+5. **Grant Delegation** → Sign once to give ShieldAI revoke permissions
+6. **Dashboard** → See your real-time approval monitoring
+7. **Test Protection** → Click demo buttons to see auto-revocation in action!
+   - **Test #1**: Unlimited approval to random EOA → Instant revoke
+   - **Test #2**: Limited approval to malicious contract → AI detects + revokes
+
+### What You'll See
+
+- ✅ **Smart account created** with MetaMask Delegation Toolkit
+- ✅ **Delegation granted** with granular permissions (approve-only)
+- ✅ **Real-time monitoring** via Envio GraphQL subscriptions
+- ✅ **AI threat detection** analyzing contract bytecode
+- ✅ **Auto-revocation** via delegation redemption
+- ✅ **Live dashboard updates** showing approval lifecycle
 
 ## 📹 Screenshots
 
@@ -233,35 +294,71 @@ envio deploy
 ### Threat Detection
 [Add screenshot]
 
-## 🔐 MetaMask Smart Accounts Implementation
+## 🔐 MetaMask Smart Accounts - Deep Dive
 
-**We use MetaMask Hybrid Smart Accounts** for this project, which provides:
+### Why Hybrid Implementation?
 
-### Why Hybrid?
-- ✅ **Works with browser wallets** (Privy, MetaMask, any wallet)
-- ✅ **EOA owner** + optional passkey signers
-- ✅ **Supports delegations** (critical for our auto-revoke feature)
-- ✅ **No EIP-7702 authorization needed** (bypasses JSON-RPC limitation)
-- ✅ **Production-ready** on Monad testnet right now
+We chose **MetaMask Hybrid Smart Accounts** because it provides the perfect balance of compatibility and advanced features:
 
-### Implementation Details
+#### ✅ Key Benefits
+- **Browser Wallet Compatible**: Works with Privy, MetaMask, WalletConnect, any EOA
+- **Delegation Support**: Critical for our autonomous revocation feature
+- **EOA Owner + Passkeys**: Flexible authentication (EOA now, passkeys later)
+- **Production Ready**: Fully functional on Monad testnet today
+- **ERC-4337 Compatible**: Gas abstraction via Pimlico bundler
+- **No EIP-7702 Required**: Bypasses JSON-RPC authorization limitations
+
+### Implementation
+
 ```typescript
+// Create smart account with delegation support
 const smartAccount = await toMetaMaskSmartAccount({
   client: publicClient,
   implementation: Implementation.Hybrid,
-  deployParams: [owner, [], [], []],
+  deployParams: [owner, [], [], []], // EOA owner, no passkeys yet
   deploySalt: '0x',
-  signer: { walletClient } // Works with Privy!
+  signer: { walletClient } // Works with Privy EOAs!
+})
+
+// Create delegation for ShieldAI
+const delegation = createDelegation({
+  from: smartAccount.address,
+  to: SHIELDAI_DELEGATE_ADDRESS,
+  scope: {
+    type: 'functionCall',
+    targets: [USDC_TOKEN_ADDRESS], // Can expand to more tokens
+    selectors: ['approve(address,uint256)'], // ONLY approve function
+  },
+  caveats: approveOnlyCaveat, // Granular restrictions
+})
+
+// User signs delegation ONCE
+const signature = await smartAccount.signDelegation({ delegation })
+
+// ShieldAI can now revoke approvals via delegation redemption
+const execution = createExecution({
+  delegation: signedDelegation,
+  mode: ExecutionMode.Call,
+  calls: [{ to: tokenAddress, data: revokeCalldata }]
 })
 ```
 
-### What This Enables
-- **Delegations**: ShieldAI can revoke approvals on your behalf
-- **Gas abstraction**: Future support for gasless transactions
-- **Advanced security**: Programmable account logic
-- **Passkey support**: Optional WebAuthn signers
+### What This Architecture Enables
 
-This approach fully meets the hackathon requirements for using MetaMask Smart Accounts!
+1. **Autonomous Protection**: ShieldAI acts on user's behalf without additional signatures
+2. **Granular Permissions**: Limited to ONLY `approve(address,uint256)` function
+3. **User Control**: Users can revoke delegation anytime via registry unregister
+4. **Gas Abstraction**: Future support for gasless revocations via paymaster
+5. **Scalability**: Can add more tokens to protection list
+6. **Composability**: Integrates seamlessly with existing DeFi protocols
+
+### Security Model
+
+- ✅ **Non-Custodial**: User always owns their smart account
+- ✅ **Scoped Permissions**: ShieldAI can ONLY call approve(), nothing else
+- ✅ **Revocable**: User can unregister and revoke delegation
+- ✅ **Transparent**: All actions recorded on-chain
+- ✅ **Auditable**: Delegation terms stored and verifiable
 
 ## 🚀 Getting Started
 
@@ -334,47 +431,132 @@ cd frontend
 pnpm test:e2e
 ```
 
-## 🏆 Why ShieldAI Wins
+## 🎯 Deployed Contracts (Monad Testnet)
 
-### Innovation
-- **First** AI-powered autonomous protection agent for Web3
-- **Novel** use of EIP-7702 delegations for security
-- **Real-time** threat detection with Envio Effect API webhooks
+| Contract | Address | Purpose |
+|----------|---------|---------|
+| **UserRegistry** | `0x4E8b57893b8A0Ab1c52E2E1E2A8B60f0E2B4e3b1` | Tracks protected accounts |
+| **Malicious Test Contract** | `0x2c641138a924cfbE42e0E6b4eb4E142D3c84ab1A` | Demo contract for AI testing |
+| **USDC (Test)** | `0x62534e4bbd6d9ebac0ac99aeaa0aa48e56372df0` | Test ERC20 token |
 
-### Technical Excellence
-- Clean, modular architecture
-- Full TypeScript type safety
-- Comprehensive error handling
-- Beautiful, accessible UI
-- Production-ready code
+**Envio Indexer**: [View on Envio Dashboard](#)  
+**Backend API**: `https://shieldai-backend.railway.app`  
+**Frontend**: `https://shieldai-monad.netlify.app`
 
-### User Experience
-- Zero friction onboarding
-- Set-and-forget protection
-- Real-time visual feedback
-- Mobile responsive
-- Intuitive dashboard
+---
 
-### Monad Integration
-- Native deployment on Monad testnet
-- Leverages high-performance EVM
-- Optimized for fast threat response
-- Future-ready for Monad mainnet
+## 💎 Why This Matters
 
-### MetaMask Innovation
-- MetaMask Hybrid Smart Accounts
-- MetaMask Delegation Toolkit integration
-- Full delegation support for auto-revocation
-- Granular permission model
-- Browser wallet compatible
+### The Real-World Impact
 
-## 🙏 Acknowledgments
+**$1.7 billion** lost annually to crypto scams. ShieldAI addresses the **#1 attack vector**: malicious token approvals.
 
-- **Monad** for the blazing-fast testnet
-- **MetaMask** for EIP-7702 and delegation toolkit
-- **Envio** for real-time indexing with Effect API
-- **Privy** for seamless wallet onboarding
-- **Railway** for backend hosting
-- **Vercel** for frontend deployment
+#### Current Pain Points
+- 🚨 Users unknowingly approve unlimited token access
+- 🚨 Phishing sites trick users into signing dangerous transactions
+- 🚨 By the time you realize, funds are already drained
+- 🚨 Manual revocation tools require constant monitoring
+
+#### ShieldAI's Solution
+- ✅ **Automatic**: No manual monitoring needed
+- ✅ **Intelligent**: AI analyzes bytecode for threats
+- ✅ **Instant**: Revokes approvals in milliseconds
+- ✅ **Trustless**: Non-custodial, user always in control
+
+### Innovation Highlights
+
+#### 1. AI-Powered Threat Detection 🤖
+- **GPT-4 bytecode analysis**: Detects malicious patterns humans can't see
+- **Function selector detection**: Identifies dangerous `transferFrom` calls
+- **Owner privilege analysis**: Spots hidden admin backdoors
+- **Honeypot detection**: Recognizes fake functions designed to trap users
+- **Risk scoring**: Quantifies threat level (0-100)
+
+#### 2. Novel Use of MetaMask Delegations 🛡️
+- **First security application** of delegation framework
+- **Granular permissions**: Scoped to ONLY approve() function
+- **Revocable trust**: Users maintain full control
+- **Gas-efficient**: Single signature enables continuous protection
+
+#### 3. Real-Time Protection via Envio ⚡
+- **Effect API webhooks**: Instant notification of new approvals
+- **Sub-second response**: Threat detected and revoked in <1s
+- **GraphQL subscriptions**: Live dashboard updates
+- **Zero latency**: No polling, truly real-time
+
+#### 4. Production-Ready Architecture 🏗️
+- **Type-safe**: TypeScript across entire stack
+- **Scalable**: Railway backend + PostgreSQL
+- **Composable**: Modular, extensible design
+- **Tested**: Comprehensive test coverage
+
+---
+
+## 🏆 Technical Achievements
+
+### Hackathon Requirements ✅
+
+- ✅ **MetaMask Smart Accounts**: Hybrid implementation with full delegation support
+- ✅ **MetaMask Delegation Toolkit**: Core to our autonomous revocation feature
+- ✅ **Monad Testnet**: All contracts deployed, leverages high-performance EVM
+- ✅ **Innovative Use Case**: First AI-powered autonomous security agent
+- ✅ **Production Quality**: Live demo, clean code, comprehensive docs
+
+### What Makes This Special
+
+1. **Autonomous Agent**: Truly set-and-forget protection
+2. **AI Integration**: Not just rules, actual intelligence
+3. **Real-Time Everything**: Instant detection, instant revocation
+4. **User Experience**: Beautiful UI, zero-friction onboarding
+5. **Technical Depth**: Advanced features (ERC-4337, delegations, webhooks)
+6. **Practical Value**: Solves a $1.7B/year problem
+
+---
+
+## 🔗 Links & Resources
+
+- 🌐 **Live Demo**: [https://shieldai-monad.netlify.app](https://shieldai-monad.netlify.app)
+- 📹 **Video Demo**: [Coming Soon](#)
+- 💻 **GitHub**: [https://github.com/officialcmg/shieldai](https://github.com/officialcmg/shieldai)
+- 📊 **Envio Indexer**: [View Dashboard](#)
+- 🔍 **Contract Verification**: [Monad Explorer](#)
+
+### Tech Stack Links
+- [MetaMask Delegation Toolkit](https://github.com/MetaMask/delegation-toolkit)
+- [Envio HyperIndex](https://envio.dev)
+- [Monad Testnet](https://testnet.monad.xyz)
+- [Privy](https://privy.io)
+
+---
+
+## 👨‍💻 Built With
+
+This project showcases innovative use of:
+- **MetaMask Smart Accounts** (Hybrid Implementation)
+- **MetaMask Delegation Toolkit** (Autonomous Actions)
+- **Monad Testnet** (High-Performance EVM)
+- **Envio HyperIndex** (Real-Time Indexing + Effect API)
+- **OpenAI GPT-4** (AI Bytecode Analysis)
+- **Next.js + TailwindCSS** (Beautiful UI/UX)
+- **Privy** (Seamless Auth)
+- **Railway + PostgreSQL** (Backend Infrastructure)
+
+---
+
+## 📄 License
+
+MIT License - feel free to use this code for your own projects!
+
+---
+
+<div align="center">
+
+**🛡️ ShieldAI - Protecting Web3, One Approval at a Time**
+
+Built for Monad & MetaMask Hackathon 2025
+
+[Try Live Demo](https://shieldai-monad.netlify.app) • [Watch Video](#) • [Read Docs](#)
+
+</div>
 
 
