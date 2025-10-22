@@ -302,7 +302,7 @@ Railway will:
 
 Railway generates a URL like:
 ```
-https://shieldai-backend-production.up.railway.app
+https://shieldai-monad-production.up.railway.app
 ```
 
 Or set a custom domain:

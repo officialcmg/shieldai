@@ -48,7 +48,7 @@
 - **Problem:** Frontend was using relative URLs that don't work for Railway backend
 - **Fix:** Updated to full Railway URL
 - **File:** `src/lib/metamask.ts`
-- **URL:** `https://shieldai.up.railway.app/api/delegation/store`
+- **URL:** `https://shieldai-monad.up.railway.app/api/delegation/store`
 
 ### **7. .gitignore**
 - **Problem:** `lib/` was ignored, affecting `frontend/src/lib/`

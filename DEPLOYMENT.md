@@ -85,7 +85,7 @@ cast send 0x2CC70f80098e20717D480270187DCb0c1Ccf826e "register()" --private-key 
 ```
 ## Backend Deployment
 
-**URL:** https://shieldai.up.railway.app
+**URL:** https://shieldai-monad.up.railway.app
 **Status:** ✅ LIVE
 
 ### Endpoints:

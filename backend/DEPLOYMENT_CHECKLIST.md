@@ -58,7 +58,7 @@ git push origin main
 
 Railway generates:
 ```
-https://shieldai-backend-production-xxxxx.up.railway.app
+https://shieldai-monad-production-xxxxx.up.railway.app
 ```
 
 Or set custom domain in **Settings** → **Networking**

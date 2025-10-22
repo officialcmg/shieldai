@@ -40,7 +40,7 @@ pnpm dev
 
 Your indexer will automatically call:
 ```
-https://shieldai.up.railway.app/api/webhook/approval
+https://shieldai-monad.up.railway.app/api/webhook/approval
 ```
 
 Check Railway logs to see webhook calls!
@@ -174,7 +174,7 @@ const notifyBackend = experimental_createEffect({
   output: S.object({ success: S.boolean }),
   cache: false,
 }, async ({ input, context }) => {
-  await fetch('https://shieldai.up.railway.app/api/webhook/approval', {
+  await fetch('https://shieldai-monad.up.railway.app/api/webhook/approval', {
     method: 'POST',
     body: JSON.stringify(input)
   });
@@ -241,7 +241,7 @@ pnpm test
 
 - **Envio Docs:** https://docs.envio.dev
 - **Dashboard:** https://envio.dev/app
-- **Backend:** https://shieldai.up.railway.app
+- **Backend:** https://shieldai-monad.up.railway.app
 - **UserRegistry:** 0x2CC70f80098e20717D480270187DCb0c1Ccf826e
 
 ---

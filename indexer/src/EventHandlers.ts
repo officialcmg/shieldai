@@ -20,7 +20,7 @@ const notifyBackend = experimental_createEffect({
   cache: false, // Don't cache webhook calls
 }, async ({ input, context }) => {
   try {
-    const response = await fetch('https://shieldai.up.railway.app/api/webhook/approval', {
+    const response = await fetch('https://shieldai-monad.up.railway.app/api/webhook/approval', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(input)

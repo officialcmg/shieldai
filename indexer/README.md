@@ -222,7 +222,7 @@ const notifyBackend = experimental_createEffect({
   input: { /* approval data */ },
   output: { success: S.boolean },
 }, async ({ input, context }) => {
-  await fetch('https://shieldai.up.railway.app/api/webhook/approval', {
+  await fetch('https://shieldai-monad.up.railway.app/api/webhook/approval', {
     method: 'POST',
     body: JSON.stringify(input)
   });

@@ -6,7 +6,7 @@
 
 [![Monad](https://img.shields.io/badge/Monad-Testnet-purple)](https://testnet.monad.xyz) [![MetaMask](https://img.shields.io/badge/MetaMask-Smart_Accounts-orange)](https://metamask.io) [![Envio](https://img.shields.io/badge/Envio-HyperIndex-blue)](https://envio.dev)
 
-> ⚠️ **DISCLAIMER**: This project uses MetaMask Hybrid Smart Accounts on Monad Testnet. Delagetions can't be signed by an EOA, so we use MetaMask Delegation Toolkit to create a smart account with full delegation support. Unfortunately, we can't use EIP-7702 authorization for this demo due to viem not supporting JSON-RPC requests for EIP-7702 authorization.
+> ⚠️ **DISCLAIMER**: This project uses MetaMask Hybrid Smart Accounts on Monad Testnet. Delegations can't be signed by an EOA, so we use MetaMask Delegation Toolkit to create a smart account with full delegation support. Unfortunately, we can't use EIP-7702 authorization for this demo due to viem not supporting JSON-RPC requests for EIP-7702 authorization.
 
 ## 🎯 The Problem
 
@@ -28,12 +28,16 @@ Every year, **$1.7+ billion** is lost to crypto phishing attacks. The most commo
 
 ### How It Works
 
-```mermaid
-User approves tokens → Envio detects instantly → AI analyzes bytecode
-    ↓
-Threat detected? → Backend redeems delegation → Approval auto-revoked
-    ↓
-User stays safe! 🎉
+```
+┌─────────────────────────────────────────────────────────────┐
+│ User approves tokens → Envio detects instantly              │
+│         ↓                                                   │
+│ AI analyzes bytecode → Threat detected?                    │
+│         ↓                                                   │
+│ Backend redeems delegation → Approval auto-revoked         │
+│         ↓                                                   │
+│ User stays safe! 🎉                                         │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 **Set it up once. Protected forever.**
@@ -201,7 +205,7 @@ PRIVATE_KEY=your_deployer_private_key
 **indexer/.env**
 ```
 ENVIO_API_TOKEN=your_envio_token
-BACKEND_WEBHOOK_URL=https://your-backend.railway.app/api/webhook/approval
+BACKEND_WEBHOOK_URL=https://shieldai-monad.up.railway.app/api/webhook/approval
 ```
 
 **backend/.env**
@@ -214,7 +218,7 @@ MONAD_RPC_URL=https://testnet-rpc.monad.xyz
 **frontend/.env**
 ```
 NEXT_PUBLIC_PRIVY_APP_ID=your_privy_app_id
-NEXT_PUBLIC_BACKEND_API_URL=https://your-backend.railway.app
+NEXT_PUBLIC_BACKEND_API_URL=https://shieldai-monad.up.railway.app
 ```
 
 ## 🌐 Deployment
@@ -442,7 +446,7 @@ pnpm test:e2e
 | **USDC (Test)** | `0x62534e4bbd6d9ebac0ac99aeaa0aa48e56372df0` | Test ERC20 token |
 
 **Envio Indexer**: [View on Envio Dashboard](#)  
-**Backend API**: `https://shieldai-backend.railway.app`  
+**Backend API**: `https://shieldai-monad.up.railway.app`  
 **Frontend**: `https://shieldai-monad.netlify.app`
 
 ---
