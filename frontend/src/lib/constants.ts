@@ -1,26 +1,7 @@
-import { defineChain } from 'viem'
+import { base } from 'viem/chains'
 
-// Monad Testnet
-export const monadTestnet = defineChain({
-  id: 10143, // Correct chain ID!
-  name: 'Monad Testnet',
-  nativeCurrency: {
-    decimals: 18,
-    name: 'Monad',
-    symbol: 'MON',
-  },
-  rpcUrls: {
-    default: {
-      http: ['https://testnet-rpc.monad.xyz'],
-    },
-  },
-  blockExplorers: {
-    default: {
-      name: 'Monad Explorer',
-      url: 'https://explorer.testnet.monad.xyz',
-    },
-  },
-})
+// Use Base Mainnet
+export const CHAIN = base
 
 // Contract Addresses
 export const USER_REGISTRY_ADDRESS = '0x2CC70f80098e20717D480270187DCb0c1Ccf826e' as const
@@ -34,5 +15,5 @@ export const ENVIO_GRAPHQL_ENDPOINT = process.env.NEXT_PUBLIC_ENVIO_GRAPHQL_ENDP
 // ShieldAI Backend API URL
 export const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3001'
 
-// Pimlico Bundler RPC URL
-export const PIMLICO_BUNDLER_URL = `https://api.pimlico.io/v2/${monadTestnet.id}/rpc?apikey=${process.env.NEXT_PUBLIC_PIMLICO_API_KEY}`
+// Pimlico Bundler RPC URL (Base mainnet)
+export const PIMLICO_BUNDLER_URL = `https://api.pimlico.io/v2/8453/rpc?apikey=${process.env.NEXT_PUBLIC_PIMLICO_API_KEY}`

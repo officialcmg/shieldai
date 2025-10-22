@@ -12,7 +12,7 @@ import type { UserApprovalsData } from '@/types/graphql'
 import { registerUser, unregisterUser } from '@/lib/metamask'
 import { Implementation, toMetaMaskSmartAccount } from '@metamask/delegation-toolkit'
 import { createWalletClient, custom, createPublicClient, http } from 'viem'
-import { monadTestnet } from '@/lib/constants'
+import { CHAIN } from '@/lib/constants'
 
 const USER_APPROVALS_SUBSCRIPTION = gql`
   subscription UserApprovals($userAddress: String!) {
@@ -85,12 +85,12 @@ export default function DashboardPage() {
       
       const walletClient = createWalletClient({
         account: wallets[0].address as `0x${string}`,
-        chain: monadTestnet,
+        chain: CHAIN,
         transport: custom(provider),
       })
 
       const publicClient = createPublicClient({
-        chain: monadTestnet,
+        chain: CHAIN,
         transport: http(),
       })
 
@@ -131,12 +131,12 @@ export default function DashboardPage() {
       
       const walletClient = createWalletClient({
         account: wallets[0].address as `0x${string}`,
-        chain: monadTestnet,
+        chain: CHAIN,
         transport: custom(provider),
       })
 
       const publicClient = createPublicClient({
-        chain: monadTestnet,
+        chain: CHAIN,
         transport: http(),
       })
 

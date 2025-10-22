@@ -5,7 +5,7 @@ import { Zap, Loader2 } from 'lucide-react'
 import { createWalletClient, custom, createPublicClient, http } from 'viem'
 import { Implementation, toMetaMaskSmartAccount } from '@metamask/delegation-toolkit'
 import { makeUnlimitedApproval, makeLimitedApproval } from '@/lib/metamask'
-import { monadTestnet } from '@/lib/constants'
+import { CHAIN } from '@/lib/constants'
 
 interface DemoSectionProps {
   userAddress: string
@@ -49,13 +49,13 @@ export function DemoSection({ userAddress }: DemoSectionProps) {
       // 2. Create wallet client with EOA account
       const walletClient = createWalletClient({
         account: eoaAddress as `0x${string}`,
-        chain: monadTestnet,
+        chain: CHAIN,
         transport: custom(window.ethereum),
       })
 
       // 3. Create public client
       const publicClient = createPublicClient({
-        chain: monadTestnet,
+        chain: CHAIN,
         transport: http(),
       })
 
@@ -119,13 +119,13 @@ export function DemoSection({ userAddress }: DemoSectionProps) {
       // 2. Create wallet client with EOA account
       const walletClient = createWalletClient({
         account: eoaAddress as `0x${string}`,
-        chain: monadTestnet,
+        chain: CHAIN,
         transport: custom(window.ethereum),
       })
 
       // 3. Create public client
       const publicClient = createPublicClient({
-        chain: monadTestnet,
+        chain: CHAIN,
         transport: http(),
       })
 

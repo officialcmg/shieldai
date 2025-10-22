@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { PrivyProvider, usePrivy } from '@privy-io/react-auth'
 import { ApolloProvider } from '@apollo/client/react'
 import { apolloClient } from '@/lib/apollo'
-import { monadTestnet } from '@/lib/constants'
+import { CHAIN } from '@/lib/constants'
 
 // Auto switch to Monad when wallet connects
 function ChainSwitcher() {
@@ -16,7 +16,7 @@ function ChainSwitcher() {
         try {
           await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: `0x${monadTestnet.id.toString(16)}` }],
+            params: [{ chainId: `0x${CHAIN.id.toString(16)}` }],
           })
         } catch (error: any) {
           // Chain not added, try adding it
@@ -25,11 +25,11 @@ function ChainSwitcher() {
               await window.ethereum.request({
                 method: 'wallet_addEthereumChain',
                 params: [{
-                  chainId: `0x${monadTestnet.id.toString(16)}`,
-                  chainName: monadTestnet.name,
-                  nativeCurrency: monadTestnet.nativeCurrency,
-                  rpcUrls: [monadTestnet.rpcUrls.default.http[0]],
-                  blockExplorerUrls: [monadTestnet.blockExplorers.default.url],
+                  chainId: `0x${CHAIN.id.toString(16)}`,
+                  chainName: CHAIN.name,
+                  nativeCurrency: CHAIN.nativeCurrency,
+                  rpcUrls: [CHAIN.rpcUrls.default.http[0]],
+                  blockExplorerUrls: [CHAIN.blockExplorers?.default?.url],
                 }],
               })
             } catch (addError) {
@@ -58,8 +58,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
           accentColor: '#8B5CF6',
           logo: '/logo.png',
         },
-        defaultChain: monadTestnet,
-        supportedChains: [monadTestnet],
+        defaultChain: CHAIN,
+        supportedChains: [CHAIN],
       }}
     >
       <ChainSwitcher />

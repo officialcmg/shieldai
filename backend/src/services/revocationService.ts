@@ -5,22 +5,22 @@ import { createExecution, ExecutionMode, getDeleGatorEnvironment, Implementation
 import { DelegationManager } from '@metamask/delegation-toolkit/contracts';
 import { getDelegation } from '../db/delegations.js';
 
-// Monad testnet configuration
-const MONAD_TESTNET = {
-  id: 10143,
-  name: 'Monad Testnet',
+// Base mainnet configuration
+const BASE_MAINNET = {
+  id: 8453,
+  name: 'Base',
   rpcUrls: {
-    default: { http: [process.env.MONAD_RPC_URL || 'https://testnet-rpc.monad.xyz'] },
+    default: { http: [process.env.BASE_RPC_URL || 'https://mainnet.base.org'] },
   },
   nativeCurrency: {
-    name: 'Monad',
-    symbol: 'MON',
+    name: 'Ethereum',
+    symbol: 'ETH',
     decimals: 18,
   },
 };
 
 // Pimlico bundler URL
-const PIMLICO_BUNDLER_URL = `https://api.pimlico.io/v2/${MONAD_TESTNET.id}/rpc?apikey=${process.env.PIMLICO_API_KEY}`;
+const PIMLICO_BUNDLER_URL = `https://api.pimlico.io/v2/${BASE_MAINNET.id}/rpc?apikey=${process.env.PIMLICO_API_KEY}`;
 
 interface RevokeParams {
   userAddress: string;
@@ -47,12 +47,12 @@ export async function revokeApproval(params: RevokeParams): Promise<string> {
   
   const walletClient = createWalletClient({
     account,
-    chain: MONAD_TESTNET,
+    chain: BASE_MAINNET,
     transport: http(),
   });
 
   const publicClient = createPublicClient({
-    chain: MONAD_TESTNET,
+    chain: BASE_MAINNET,
     transport: http(),
   });
 
@@ -73,7 +73,7 @@ export async function revokeApproval(params: RevokeParams): Promise<string> {
   console.log(`   🔍 Checking if EOA is already upgraded...`);
   const code = await publicClient.getCode({ address: account.address });
   
-  const environment = getDeleGatorEnvironment(MONAD_TESTNET.id);
+  const environment = getDeleGatorEnvironment(BASE_MAINNET.id);
   
   // if (!code || code === '0x' || code === '0x0') {
   //   // EOA not upgraded yet, authorize EIP-7702 delegation
@@ -158,7 +158,7 @@ export async function revokeApproval(params: RevokeParams): Promise<string> {
   const txHash = await walletClient.sendTransaction({
     to: delegationManagerAddress,
     data: redeemCalldata,
-    chain: MONAD_TESTNET,
+    chain: BASE_MAINNET,
   });
 
   console.log(`   ✅ Revocation transaction sent!`);

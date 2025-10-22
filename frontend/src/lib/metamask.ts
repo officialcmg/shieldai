@@ -10,11 +10,11 @@ import { createCaveatBuilder } from '@metamask/delegation-toolkit/utils'
 import { DelegationManager } from '@metamask/delegation-toolkit/contracts'
 import { createWalletClient, custom, createPublicClient, http, encodeFunctionData, type Address } from 'viem'
 import { createBundlerClient, createPaymasterClient } from 'viem/account-abstraction'
-import { monadTestnet, USER_REGISTRY_ADDRESS, SHIELDAI_DELEGATE_ADDRESS, BACKEND_API_URL, PIMLICO_BUNDLER_URL } from './constants'
+import { CHAIN, USER_REGISTRY_ADDRESS, SHIELDAI_DELEGATE_ADDRESS, BACKEND_API_URL, PIMLICO_BUNDLER_URL } from './constants'
 
-// Create public client for Monad
+// Create public client for Base
 export const publicClient = createPublicClient({
-  chain: monadTestnet,
+  chain: CHAIN,
   transport: http(),
 })
 

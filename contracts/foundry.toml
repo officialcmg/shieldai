@@ -9,5 +9,6 @@ optimizer_runs = 200
 # RPC endpoints
 [rpc_endpoints]
 monad = "${MONAD_RPC_URL}"
+base = "https://mainnet.base.org"
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

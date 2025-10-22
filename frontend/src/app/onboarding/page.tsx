@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Shield, CheckCircle2, Loader2 } from 'lucide-react'
 import confetti from 'canvas-confetti'
 import { createWalletClient, custom, createPublicClient, http } from 'viem'
-import { monadTestnet } from '@/lib/constants'
+import { CHAIN } from '@/lib/constants'
 import { Implementation, toMetaMaskSmartAccount } from '@metamask/delegation-toolkit'
 import {
   createProtectionDelegation,
@@ -73,14 +73,14 @@ export default function OnboardingPage() {
 
       // Create public client for reading blockchain state
       const publicClient = createPublicClient({
-        chain: monadTestnet,
+        chain: CHAIN,
         transport: http(),
       })
 
       // Create wallet client using Privy's provider
       const walletClient = createWalletClient({
         account: userAddress as `0x${string}`,
-        chain: monadTestnet,
+        chain: CHAIN,
         transport: custom(window.ethereum),
       })
 
@@ -136,7 +136,7 @@ export default function OnboardingPage() {
           account: owner as `0x${string}`,
           to: factory,
           data: factoryData,
-          chain: monadTestnet,
+          chain: CHAIN,
         })
         
         console.log('⏳ Waiting for deployment...')
@@ -189,13 +189,13 @@ export default function OnboardingPage() {
 
       // Create public and wallet clients
       const publicClient = createPublicClient({
-        chain: monadTestnet,
+        chain: CHAIN,
         transport: http(),
       })
 
       const walletClient = createWalletClient({
         account: userAddress as `0x${string}`,
-        chain: monadTestnet,
+        chain: CHAIN,
         transport: custom(window.ethereum),
       })
 

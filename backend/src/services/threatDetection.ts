@@ -6,13 +6,13 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '',
 });
 
-// Initialize Monad testnet client for fetching bytecode
+// Initialize Base mainnet client for fetching bytecode
 const publicClient = createPublicClient({
   chain: {
-    id: 10143,
-    name: 'Monad Testnet',
-    rpcUrls: { default: { http: ['https://testnet-rpc.monad.xyz'] } },
-    nativeCurrency: { name: 'Monad', symbol: 'MON', decimals: 18 },
+    id: 8453,
+    name: 'Base',
+    rpcUrls: { default: { http: [process.env.BASE_RPC_URL || 'https://mainnet.base.org'] } },
+    nativeCurrency: { name: 'Ethereum', symbol: 'ETH', decimals: 18 },
   },
   transport: http(),
 });
@@ -89,7 +89,7 @@ async function getAIVerdict(approval: ApprovalEvent): Promise<ThreatResult> {
 
   try {
     // Step 1: Fetch contract bytecode
-    console.log('\n📡 Fetching contract bytecode from Monad testnet...');
+    console.log('\n📡 Fetching contract bytecode from Base mainnet...');
     const bytecode = await publicClient.getCode({
       address: approval.spender as Address,
     });
