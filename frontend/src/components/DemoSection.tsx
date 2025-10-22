@@ -139,9 +139,9 @@ export function DemoSection({ userAddress }: DemoSectionProps) {
 
       console.log('   ✅ Smart account ready!')
 
-      // 5. Approve LIMITED amount (69420 USDC) to MALICIOUS CONTRACT
+      // 5. Approve LIMITED amount (69420 SHIELD) to MALICIOUS CONTRACT
       // This triggers AI bytecode analysis!
-      const approvalAmount = BigInt(69420) * BigInt(10 ** 6) // 69,420 USDC (6 decimals)
+      const approvalAmount = BigInt(69420) * BigInt(10 ** 6) // 69,420 Demo Tokens (6 decimals)
       
       const txHash = await makeLimitedApproval(
         smartAccount,
@@ -150,7 +150,7 @@ export function DemoSection({ userAddress }: DemoSectionProps) {
         approvalAmount
       )
 
-      console.log('✅ Limited approval (69,420 USDC) to malicious contract created!')
+      console.log('✅ Limited approval (69,420 Demo Tokens) to malicious contract created!')
       console.log('   TX Hash:', txHash)
       setSuccess2(true)
 
@@ -214,7 +214,7 @@ export function DemoSection({ userAddress }: DemoSectionProps) {
             className="w-full px-4 py-2.5 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
           >
             {loading1 && <Loader2 className="w-4 h-4 animate-spin" />}
-            {loading1 ? 'Creating...' : 'Approve UNLIMITED USDC'}
+            {loading1 ? 'Creating...' : 'Approve UNLIMITED Demo Tokens'}
           </button>
 
           <p className="mt-2 text-xs text-gray-600 text-center">
@@ -239,7 +239,7 @@ export function DemoSection({ userAddress }: DemoSectionProps) {
           <div className="bg-white rounded-lg p-3 mb-4">
             <h4 className="font-semibold mb-2 text-xs text-gray-900">What happens:</h4>
             <ol className="text-xs text-gray-700 space-y-1 list-decimal list-inside">
-              <li>Approve 69,420 USDC to malicious contract</li>
+              <li>Approve 69,420 Demo Tokens to malicious contract</li>
               <li>AI fetches & analyzes bytecode</li>
               <li>Detects: drain functions, backdoors</li>
               <li>Risk Score: 95/100 → REVOKED! 🔥</li>
@@ -264,7 +264,7 @@ export function DemoSection({ userAddress }: DemoSectionProps) {
             className="w-full px-4 py-2.5 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
           >
             {loading2 && <Loader2 className="w-4 h-4 animate-spin" />}
-            {loading2 ? 'Creating...' : 'Approve 69,420 USDC (AI Test)'}
+            {loading2 ? 'Creating...' : 'Approve 69,420 SHIELD (AI Test)'}
           </button>
 
           <p className="mt-2 text-xs text-gray-600 text-center">
