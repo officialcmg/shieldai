@@ -49,9 +49,9 @@ export async function createProtectionDelegation(smartAccount: any) {
 
   // Create delegation with functionCall scope
   // This scope type works with allowedMethods caveat without conflicts
-  // Using demo USDC token as target (for testing - can expand later)
+  // Using Shield Demo Token as target (for testing - can expand later)
   // TODO: Expand targets array to include more token addresses for broader protection
-  const DEMO_USDC_TOKEN = '0x62534e4bbd6d9ebac0ac99aeaa0aa48e56372df0'
+  const DEMO_TOKEN = '0x8Fcc4B343cCE5F467FcCC8cdBfe25634a575A685'
   
   const delegation = createDelegation({
     from: smartAccount.address,
@@ -59,7 +59,7 @@ export async function createProtectionDelegation(smartAccount: any) {
     environment: smartAccount.environment,
     scope: {
       type: 'functionCall',
-      targets: [DEMO_USDC_TOKEN], // Can add more tokens: [TOKEN1, TOKEN2, TOKEN3, ...]
+      targets: [DEMO_TOKEN], // Can add more tokens: [TOKEN1, TOKEN2, TOKEN3, ...]
       selectors: ['approve(address,uint256)'], // Same as caveat - necessary for scope
     },
     caveats: approveOnlyCaveat,
