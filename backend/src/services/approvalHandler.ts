@@ -13,7 +13,7 @@ interface ApprovalEvent {
 }
 
 /**
- * Main handler for new approval events
+ * Main handler for new approval eventss
  * Called by webhook when Envio detects a monitored user approval
  */
 export async function handleNewApproval(approval: ApprovalEvent): Promise<void> {
