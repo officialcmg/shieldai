@@ -42,3 +42,4 @@ test/
 *.orig
 *.rej
 .eslintcache
+contracts/lib

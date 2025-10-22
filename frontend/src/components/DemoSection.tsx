@@ -11,11 +11,10 @@ interface DemoSectionProps {
   userAddress: string
 }
 
-// Mock ERC20 token for demo
-// Using USDC address 
-const DEMO_TOKEN_ADDRESS = '0x62534e4bbd6d9ebac0ac99aeaa0aa48e56372df0'
+// Demo contracts deployed on Base
+const DEMO_TOKEN_ADDRESS = '0x8Fcc4B343cCE5F467FcCC8cdBfe25634a575A685' // Shield Demo Token
 const SUSPICIOUS_SPENDER = '0x1234567890123456789012345678901234567890' // Random address
-const MALICIOUS_CONTRACT = '0x2c641138a924cfbE42e0E6b4eb4E142D3c84ab1A' // Deployed malicious contract
+const MALICIOUS_CONTRACT = '0x9BDD2cB47Cbd216DC129310C9e5BEE48C7025976' // Malicious contract on Base
 
 export function DemoSection({ userAddress }: DemoSectionProps) {
   const [loading1, setLoading1] = useState(false)
